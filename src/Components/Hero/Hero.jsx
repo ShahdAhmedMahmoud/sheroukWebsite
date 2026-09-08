@@ -20,11 +20,11 @@ export default function Hero() {
       <div className="relative z-10 flex h-full items-center justify-center text-center text-white">
         <div>
           <h1 className="text-6xl font-bold tracking-wider md:text-8xl">
-            SHOROUQ
+            AL SHOROUK
           </h1>
 
           <p className="mt-4 text-lg tracking-[0.3em] md:text-2xl">
-            GENERAL CONTRACTING & SUPPLIES
+            CONSTRUCTION COMPANY
           </p>
         </div>
       </div>

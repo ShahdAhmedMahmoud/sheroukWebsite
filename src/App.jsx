@@ -1,6 +1,8 @@
-import Home from "./Components/Home/Home";
+
 
 // import BuildingAnimation from "./Components/BuildingAnimation/BuildingAnimation";
+
+import Home from "./Pages/Home/Home";
 
 function App() {
   return<>
