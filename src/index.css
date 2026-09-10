@@ -32,3 +32,29 @@ h5,
 h6 {
   font-family: var(--font-display);
 }
+
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+.animate-progress-fill {
+  animation: progressFill 6s linear forwards;
+}
+
+
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.animate-marquee-left { animation: marquee-left linear infinite; }
+.animate-marquee-right { animation: marquee-right linear infinite; }
+
+/* بيدايركشنال + وقف عند الهوفر */
+.marquee-row:hover .animate-marquee-left,
+.marquee-row:hover .animate-marquee-right {
+  animation-play-state: paused;
+}

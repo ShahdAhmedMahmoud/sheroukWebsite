@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import  { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const cn = (...classes) => classes.filter(Boolean).join(" ");
@@ -172,9 +172,7 @@ export default function CoverflowCarousel({
     rafRef.current = requestAnimationFrame(animate);
   };
 
-  /*
-   * Move to a specific slide.
-   */
+ 
   const goTo = (index) => {
     if (slideCount === 0) return;
 
