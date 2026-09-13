@@ -268,7 +268,7 @@
 //                     className={cx(
 //                       "px-3 py-1 rounded-full text-xs font-semibold mb-4",
 //                       slide.status === "Finished"
-//                         ? "bg-[#FEC419] text-[#1E2432]"
+//                         ? "bg-[#D98A2B] text-[#1E2432]"
 //                         : "bg-white/20 text-white"
 //                     )}
 //                   >
@@ -276,7 +276,7 @@
 //                   </span>
 //                   <a
 //                     href={slide.href || "#"}
-//                     className="inline-flex items-center gap-1 text-[#FEC419] font-semibold text-sm"
+//                     className="inline-flex items-center gap-1 text-[#D98A2B] font-semibold text-sm"
 //                   >
 //                     Learn More
 //                     <ChevronRight className="w-4 h-4" />
@@ -610,7 +610,7 @@ export function ProjectsCarousel({
                     className={cx(
                       "px-3 py-1 rounded-full text-xs font-semibold mb-4",
                       slide.status === "Finished"
-                        ? "bg-[#FEC419] text-[#1E2432]"
+                        ? "bg-[#D98A2B] text-[#1E2432]"
                         : "bg-white/20 text-white"
                     )}
                   >
@@ -618,7 +618,7 @@ export function ProjectsCarousel({
                   </span>
                   <a
                     href={slide.href || "#"}
-                    className="inline-flex items-center gap-1 text-[#FEC419] font-semibold text-sm"
+                    className="inline-flex items-center gap-1 text-[#D98A2B] font-semibold text-sm"
                   >
                     Learn More
                     <ChevronRight className="w-4 h-4" />

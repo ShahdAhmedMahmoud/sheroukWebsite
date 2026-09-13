@@ -105,7 +105,7 @@ export default function MapSection() {
                 {/* دائرة نبض حوالين الـ pin النشط */}
                 {activeId === project.id && (
                   <motion.span
-                    className="absolute inset-0 rounded-full bg-[#FFBF00]"
+                    className="absolute inset-0 rounded-full bg-[#D98A2B]"
                     animate={{ scale: [1, 2.2], opacity: [0.6, 0] }}
                     transition={{ duration: 1.4, repeat: Infinity }}
                   />
@@ -113,7 +113,7 @@ export default function MapSection() {
                 <motion.div
                   animate={{ scale: activeId === project.id ? 1.4 : 1 }}
                   className={`relative flex items-center justify-center w-7 h-7 rounded-full shadow-md border-2 border-white ${
-                    activeId === project.id ? "bg-[#FFBF00]" : "bg-white"
+                    activeId === project.id ? "bg-[#D98A2B]" : "bg-white"
                   }`}
                 >
                   <MapPin

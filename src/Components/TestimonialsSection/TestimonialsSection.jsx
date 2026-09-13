@@ -72,44 +72,15 @@ const wordVariant = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
-// function TestimonialCard({ text, image, name, role }) {
-//   return (
-//     <div className="p-8 rounded-2xl border border-[#6C757D]/15 bg-white shadow-md shadow-[#1F3888]/5 max-w-xs w-full">
-//       <Quote className="w-6 h-6 text-[#FFBF00] mb-3" />
-//       <div className="flex gap-0.5 mb-3">
-//         {Array.from({ length: 5 }).map((_, i) => (
-//           <Star key={i} className="w-3.5 h-3.5 fill-[#FFBF00] text-[#FFBF00]" />
-//         ))}
-//       </div>
-//       <p className="text-[#1E2432] text-sm leading-relaxed">{text}</p>
-//       <div className="flex items-center gap-3 mt-5">
-//         <img
-//           width={40}
-//           height={40}
-//           src={image}
-//           alt={name}
-//           className="h-10 w-10 rounded-full object-cover"
-//         />
-//         <div className="flex flex-col">
-//           <div className="font-semibold text-[#1E2432] text-sm tracking-tight leading-5">
-//             {name}
-//           </div>
-//           <div className="text-xs text-[#6C757D] leading-5 tracking-tight">
-//             {role}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
+
 
 function TestimonialCard({ text, image, name, role }) {
   return (
     <div className="p-8 rounded-2xl border border-[#6C757D]/15 bg-white shadow-md shadow-[#1F3888]/5 max-w-xs w-full">
-      <Quote className="w-6 h-6 text-[#FFBF00] mb-3" />
+      <Quote className="w-6 h-6 text-[#D98A2B] mb-3" />
       <div className="flex gap-0.5 mb-3">
         {Array.from({ length: 5 }).map((_, i) => (
-          <Star key={i} className="w-3.5 h-3.5 fill-[#FFBF00] text-[#FFBF00]" />
+          <Star key={i} className="w-3.5 h-3.5 fill-[#D98A2B] text-[#D98A2B]" />
         ))}
       </div>
       <p className="text-[#1E2432] text-sm leading-relaxed">{text}</p>
@@ -134,26 +105,7 @@ function TestimonialCard({ text, image, name, role }) {
   );
 }
 
-// function TestimonialsColumn({ testimonials, duration = 15, className = "" }) {
-//   return (
-//     <div className={className}>
-//       <div
-//         className="flex flex-col gap-6 pb-6 animate-scroll-up hover:[animation-play-state:paused]"
-//         style={{ animationDuration: `${duration}s` }}
-//       >
-//         {/* بنكرر المصفوفة مرتين، وبنحرك العمود -50% بس - يعني بيوصل لنص المسافة بالظبط
-//             (اللي هي طول النسخة الأولى)، فيبان وكأنه بيلف من غير أي قطع ملحوظ */}
-//         {[0, 1].map((copy) => (
-//           <div key={copy} className="flex flex-col gap-6">
-//             {testimonials.map((t, i) => (
-//               <TestimonialCard key={`${copy}-${i}`} {...t} />
-//             ))}
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
+
 
 function TestimonialsColumn({ testimonials, duration = 15, className = "" }) {
   return (
@@ -184,7 +136,7 @@ function TestimonialsColumn({ testimonials, duration = 15, className = "" }) {
 
 export default function TestimonialsSection() {
   return (
-    <section className="bg-[#F8F9FD] py-20 relative">
+    <section className="bg-[#F8F9FD] py-20 relative" id="testimonials">
       <div className="container mx-auto px-4">
         <motion.div
           initial="hidden"

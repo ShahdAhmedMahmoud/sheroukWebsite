@@ -53,8 +53,11 @@ h6 {
 .animate-marquee-left { animation: marquee-left linear infinite; }
 .animate-marquee-right { animation: marquee-right linear infinite; }
 
-/* بيدايركشنال + وقف عند الهوفر */
+
 .marquee-row:hover .animate-marquee-left,
 .marquee-row:hover .animate-marquee-right {
   animation-play-state: paused;
 }
+
+html { scroll-behavior: smooth; }
+section { scroll-margin-top: 100px; }

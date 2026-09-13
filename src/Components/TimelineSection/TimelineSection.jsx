@@ -222,12 +222,12 @@ export default function TimelineSection() {
   return (
 
     
-    <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden rounded-2xl bg-[#1E2432]">
+    <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden rounded-2xl bg-[#1E2432]" id ="timeline">
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#1E2432]/90 via-[#1E2432]/40 to-transparent pointer-events-none" />
 
       <div className="relative z-10 h-full flex flex-col justify-end p-8 md:p-14">
-        <span className="text-[#FFBF00] font-semibold tracking-wide mb-2">
+        <span className="text-[#D98A2B] font-semibold tracking-wide mb-2">
           {milestones[activeIndex].year}
         </span>
         <h3 ref={titleRef} className="text-3xl md:text-5xl font-bold text-white mb-3">
@@ -243,14 +243,14 @@ export default function TimelineSection() {
               key={m.year}
               onClick={() => goTo(i)}
               className={`flex-shrink-0 text-left px-4 py-2 rounded-lg border transition-colors ${
-                i === activeIndex ? "border-[#FFBF00] bg-white/10" : "border-white/20 hover:border-white/40"
+                i === activeIndex ? "border-[#D98A2B] bg-white/10" : "border-white/20 hover:border-white/40"
               }`}
             >
               <div className="h-0.5 bg-white/20 w-16 mb-2 relative overflow-hidden rounded-full">
                 {i === activeIndex && (
                   <div
                     key={activeIndex}
-                    className="absolute inset-y-0 left-0 bg-[#FFBF00] animate-progress-fill"
+                    className="absolute inset-y-0 left-0 bg-[#D98A2B] animate-progress-fill"
                   />
                 )}
               </div>

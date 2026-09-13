@@ -63,7 +63,7 @@
 //               viewport={{ once: true, amount: 0.4 }}
 //               transition={{ duration: 0.6, ease: "easeOut" }}
 //             >
-//               <Target className="w-6 h-6 text-[#FFBF00] mb-2" />
+//               <Target className="w-6 h-6 text-[#D98A2B] mb-2" />
 //               <h4 className="font-bold text-[#1E2432] mb-1">Our Mission</h4>
 //               <p className="text-sm text-[#6C757D]">
 //                 Building the future with precision and integrity.
@@ -88,7 +88,7 @@
          
 //           <a
 //             href="/about"
-//             className="inline-block bg-[#FFBF00] text-[#1E2432] font-semibold px-6 py-3 rounded-full hover:opacity-90 transition-opacity"
+//             className="inline-block bg-[#D98A2B] text-[#1E2432] font-semibold px-6 py-3 rounded-full hover:opacity-90 transition-opacity"
 //           >
 //            learn more
 //           </a>
@@ -298,10 +298,10 @@ const stats = [
 
 export default function AboutSection() {
   return (
-    <section className="w-full py-24 px-4 bg-[#F8F9FD] overflow-hidden relative">
+    <section className="w-full py-24 px-4 overflow-hidden relative" id="about">
       {/* عناصر ديكور خلفية */}
       <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-[#1F3888]/5 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-[#FFBF00]/10 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-[#D98A2B]/10 blur-3xl pointer-events-none" />
 
       <motion.div
         className="container mx-auto max-w-6xl relative z-10"
@@ -312,7 +312,7 @@ export default function AboutSection() {
       >
         {/* العنوان */}
         <motion.div className="flex flex-col items-center mb-6" variants={itemVariants}>
-          <span className="text-[#FFBF00] font-semibold mb-2 tracking-wide text-sm">
+          <span className="text-[#D98A2B] font-semibold mb-2 tracking-wide text-sm">
             DISCOVER OUR STORY
           </span>
           <h2 className="text-4xl md:text-5xl font-bold text-[#1E2432] text-center">
@@ -368,14 +368,14 @@ export default function AboutSection() {
                   className="w-full h-80 object-cover"
                 />
               </motion.div>
-              <div className="absolute inset-0 border-4 border-[#FFBF00] rounded-2xl -m-3 -z-10" />
+              <div className="absolute inset-0 border-4 border-[#D98A2B] rounded-2xl -m-3 -z-10" />
               <motion.div
                 className="absolute -top-4 -right-6 w-16 h-16 rounded-full bg-[#1F3888]/10"
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
-                className="absolute -bottom-6 -left-8 w-20 h-20 rounded-full bg-[#FFBF00]/20"
+                className="absolute -bottom-6 -left-8 w-20 h-20 rounded-full bg-[#D98A2B]/20"
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
               />
@@ -426,7 +426,7 @@ export default function AboutSection() {
           </div>
           <a
             href="/contact"
-            className="bg-[#FFBF00] text-[#1E2432] px-6 py-3 rounded-full font-semibold flex items-center gap-2 hover:opacity-90 transition-opacity"
+            className="bg-[#D98A2B] text-[#1E2432] px-6 py-3 rounded-full font-semibold flex items-center gap-2 hover:opacity-90 transition-opacity"
           >
             Get In Touch <ArrowRight className="w-4 h-4" />
           </a>
@@ -447,7 +447,7 @@ function FeatureItem({ icon, title, description, delay, direction }) {
       whileHover={{ y: -5 }}
     >
       <div className="flex items-center gap-3 mb-2">
-        <div className="text-[#1F3888] bg-[#1F3888]/10 p-3 rounded-lg group-hover:bg-[#FFBF00]/20 group-hover:text-[#1E2432] transition-colors duration-300">
+        <div className="text-[#1F3888] bg-[#1F3888]/10 p-3 rounded-lg group-hover:bg-[#D98A2B]/20 group-hover:text-[#1E2432] transition-colors duration-300">
           {icon}
         </div>
         <h4 className="text-lg font-bold text-[#1E2432]">{title}</h4>

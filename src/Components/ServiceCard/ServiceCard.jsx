@@ -50,7 +50,7 @@ export default function ServiceCard({ Icon, title, description, index, direction
   return (
     <motion.div
       ref={cardRef}
-      className="group relative overflow-hidden bg-white rounded-2xl shadow-md p-8 cursor-pointer border border-transparent hover:border-[#FFBF00]/30"
+      className="group relative overflow-hidden bg-white rounded-2xl shadow-md p-8 cursor-pointer border border-transparent hover:border-[#D98A2B]/30"
       style={{ transformStyle: "preserve-3d" }}
       // ==== دخول الكارت: تقلّب 3D + تكبير تدريجي من الاتجاه المحدد ====
       initial={{ opacity: 0, scale: 0.4, ...initialOffset }}
@@ -81,7 +81,7 @@ export default function ServiceCard({ Icon, title, description, index, direction
           <Icon
             ref={iconRef}
             strokeWidth={1.3}
-            className="w-11 h-11 text-[#1F3888] transition-all duration-500 ease-in-out group-hover:scale-150 group-hover:rotate-[25deg] group-hover:text-[#FFBF00]"
+            className="w-11 h-11 text-[#1F3888] transition-all duration-500 ease-in-out group-hover:scale-150 group-hover:rotate-[25deg] group-hover:text-[#D98A2B]"
           />
         </div>
 

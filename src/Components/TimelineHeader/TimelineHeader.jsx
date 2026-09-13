@@ -35,7 +35,7 @@ export default function TimelineHeader() {
       <div className="relative z-10 text-center">
         {/* الـ eyebrow label */}
         <motion.span
-          className="inline-flex items-center gap-2 text-[#FFBF00] font-semibold tracking-[0.2em] text-sm mb-4"
+          className="inline-flex items-center gap-2 text-[#D98A2B] font-semibold tracking-[0.2em] text-sm mb-4"
           initial={{ opacity: 0, y: -10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

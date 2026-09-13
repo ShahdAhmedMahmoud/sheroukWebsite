@@ -19,12 +19,12 @@ export default function Home() {
 
      <Hero/>
 
-<BricksAccentBackground backgroundColor="#F8F9FD">
+<BricksAccentBackground backgroundColor="#F8F9FD" opacity={0.4}>
            <AboutSection/>
-     <ServicesSection/>
+    
 
 </BricksAccentBackground>
-
+ <ServicesSection/>
 
 
 
