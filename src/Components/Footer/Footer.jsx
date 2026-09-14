@@ -133,7 +133,7 @@ export default function Footer() {
         {/* الأعمدة */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
           <div>
-            <h4 className="text-xl font-bold text-white mb-3">AL SHOROUQ</h4>
+            <h4 className="text-xl font-bold text-white mb-3">AL SHOROUk</h4>
             <p className="text-white/60 text-sm leading-relaxed mb-5">
               Building Egypt's future with precision, integrity, and over a
               decade of construction excellence.

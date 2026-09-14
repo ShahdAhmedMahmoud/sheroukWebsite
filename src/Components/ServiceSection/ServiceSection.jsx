@@ -92,7 +92,7 @@ function ServiceDescription() {
 export default function ServicesSection() {
   return (
     <section
-      className="relative w-full py-24 px-4 overflow-hidden"
+      className="relative w-full py-24 px-4 overflow-hidden bg-[#F8F9FD]"
       id="services"
     >
   {/* Construction Video Background */}
