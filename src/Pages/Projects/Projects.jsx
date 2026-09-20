@@ -5,6 +5,8 @@ import SectorFilterSection from '../../Components/SectorFilterSection/SectorFilt
 import SiteHoardingDivider from '../../Components/SiteHoardingDivider/SiteHoardingDivider'
 import ProjectsRevealTransition from '../../Components/ProjectsRevealTransition/ProjectsRevealTransition'
 import FlowScroll, { FlowSection } from '../../Components/FlowScroll/FlowScroll'
+import ProjectsCTASection from '../../Components/Projectsctasection/Projectsctasection'
+import ProjectBeforeAfter from '../../Components/ProjectBeforeAfter/ProjectBeforeAfter'
 
 export default function Projects() {
   return<>
@@ -16,6 +18,11 @@ export default function Projects() {
       <FlowSection aria-label="Sectors" className="bg-[#F8F9FD]" >
         <SectorFilterSection />
       </FlowSection>
+      <FlowSection aria-label="CTA" className="bg-[#1E2432]" >
+        <ProjectsCTASection />
+      </FlowSection>
+
+     
     </FlowScroll>
   
   </>

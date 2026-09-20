@@ -1,13 +1,21 @@
 
+
+
 import { useEffect, useRef, useCallback } from "react";
 
-const CELL_SIZE = 55;
-const INFLUENCE_RADIUS = 220;
-const MAX_WARP = 18;
-const DOT_SPACING = 30;
 const LERP_SPEED = 0.08;
-
 const LINE_BASE = { r: 255, g: 255, b: 255, a: 0.07 };
+
+// إعدادات الشبكة حسب عرض الشاشة: على الموبايل خلايا أكبر ونقط أقل = أداء أحسن
+function getGridConfig(width) {
+  if (width < 640) {
+    return { cell: 78, influence: 130, maxWarp: 12, dotSpacing: 44 };
+  }
+  if (width < 1024) {
+    return { cell: 65, influence: 180, maxWarp: 15, dotSpacing: 36 };
+  }
+  return { cell: 55, influence: 220, maxWarp: 18, dotSpacing: 30 };
+}
 
 function lerpN(a, b, t) {
   return a + (b - a) * t;
@@ -20,7 +28,7 @@ function lerpColor(base, active, t) {
   return `rgba(${r},${g},${b},${a.toFixed(3)})`;
 }
 
-// ألوان الموقع (يلو + نقطة توهج نيفي خفيفة) بدل الأزرق الافتراضي بتاع الكومبوننت الأصلي
+// ألوان الموقع (يلو + توهج خفيف) بدل الأزرق الافتراضي
 const THEME = {
   lineActive: { r: 255, g: 191, b: 0, a: 0.5 },
   nodeActive: { r: 255, g: 191, b: 0, a: 1 },
@@ -36,46 +44,55 @@ export default function KineticGrid({ children, className = "" }) {
   const ripplesRef = useRef([]);
   const rafRef = useRef(0);
   const sizeRef = useRef({ w: 0, h: 0 });
+  const configRef = useRef(getGridConfig(typeof window === "undefined" ? 1280 : window.innerWidth));
 
-  const getWarpedPoint = useCallback((gx, gy, col, row, mouse, ripples, cols, rows) => {
-    const edgeMargin = 1.5;
-    const colPin = Math.min(col / edgeMargin, (cols - 1 - col) / edgeMargin, 1);
-    const rowPin = Math.min(row / edgeMargin, (rows - 1 - row) / edgeMargin, 1);
-    const pinFactor = colPin * colPin * rowPin * rowPin;
+  const getWarpedPoint = useCallback(
+    (gx, gy, col, row, mouse, ripples, cols, rows) => {
+      const { influence, maxWarp } = configRef.current;
+      const edgeMargin = 1.5;
+      const colPin = Math.min(col / edgeMargin, (cols - 1 - col) / edgeMargin, 1);
+      const rowPin = Math.min(row / edgeMargin, (rows - 1 - row) / edgeMargin, 1);
+      const pinFactor = colPin * colPin * rowPin * rowPin;
 
-    const dx = gx - mouse.x;
-    const dy = gy - mouse.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    const proximity = Math.max(0, 1 - dist / INFLUENCE_RADIUS) * pinFactor;
+      const dx = gx - mouse.x;
+      const dy = gy - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const proximity = Math.max(0, 1 - dist / influence) * pinFactor;
 
-    let rx = 0, ry = 0;
-    for (const r of ripples) {
-      const rdx = gx - r.x;
-      const rdy = gy - r.y;
-      const rdist = Math.sqrt(rdx * rdx + rdy * rdy);
-      const waveWidth = 55;
-      const diff = rdist - r.radius;
-      if (Math.abs(diff) < waveWidth) {
-        const strength = (1 - Math.abs(diff) / waveWidth) * r.opacity * 18 * pinFactor;
-        const angle = Math.atan2(rdy, rdx);
-        const sign = diff < 0 ? -1 : 1;
-        rx += Math.cos(angle) * strength * sign * -1;
-        ry += Math.sin(angle) * strength * sign * -1;
+      let rx = 0,
+        ry = 0;
+      for (const r of ripples) {
+        const rdx = gx - r.x;
+        const rdy = gy - r.y;
+        const rdist = Math.sqrt(rdx * rdx + rdy * rdy);
+        const waveWidth = 55;
+        const diff = rdist - r.radius;
+        if (Math.abs(diff) < waveWidth) {
+          const strength = (1 - Math.abs(diff) / waveWidth) * r.opacity * 18 * pinFactor;
+          const angle = Math.atan2(rdy, rdx);
+          const sign = diff < 0 ? -1 : 1;
+          rx += Math.cos(angle) * strength * sign * -1;
+          ry += Math.sin(angle) * strength * sign * -1;
+        }
       }
-    }
 
-    if (dist < INFLUENCE_RADIUS && dist > 0 && pinFactor > 0) {
-      const t = dist / INFLUENCE_RADIUS;
-      const eased = t < 0.01 ? 0 : (1 - t) * (1 - t) * Math.min(1, dist / 60);
-      const warpAmt = eased * MAX_WARP * pinFactor;
-      const angle = Math.atan2(dy, dx);
-      return {
-        pt: { x: gx - Math.cos(angle) * warpAmt + rx, y: gy - Math.sin(angle) * warpAmt + ry },
-        proximity,
-      };
-    }
-    return { pt: { x: gx + rx, y: gy + ry }, proximity };
-  }, []);
+      if (dist < influence && dist > 0 && pinFactor > 0) {
+        const t = dist / influence;
+        const eased = t < 0.01 ? 0 : (1 - t) * (1 - t) * Math.min(1, dist / 60);
+        const warpAmt = eased * maxWarp * pinFactor;
+        const angle = Math.atan2(dy, dx);
+        return {
+          pt: {
+            x: gx - Math.cos(angle) * warpAmt + rx,
+            y: gy - Math.sin(angle) * warpAmt + ry,
+          },
+          proximity,
+        };
+      }
+      return { pt: { x: gx + rx, y: gy + ry }, proximity };
+    },
+    []
+  );
 
   const draw = useCallback(
     (now) => {
@@ -86,14 +103,15 @@ export default function KineticGrid({ children, className = "" }) {
 
       const { w: W, h: H } = sizeRef.current;
       if (!W || !H) return;
+      const { cell, dotSpacing } = configRef.current;
       const mouse = mouseRef.current;
       const ripples = ripplesRef.current;
 
       ctx.clearRect(0, 0, W, H);
 
       ctx.fillStyle = "rgba(255,255,255,0.035)";
-      for (let x = DOT_SPACING / 2; x < W; x += DOT_SPACING) {
-        for (let y = DOT_SPACING / 2; y < H; y += DOT_SPACING) {
+      for (let x = dotSpacing / 2; x < W; x += dotSpacing) {
+        for (let y = dotSpacing / 2; y < H; y += dotSpacing) {
           ctx.beginPath();
           ctx.arc(x, y, 0.7, 0, Math.PI * 2);
           ctx.fill();
@@ -108,8 +126,8 @@ export default function KineticGrid({ children, className = "" }) {
         if (r.opacity <= 0) ripples.splice(i, 1);
       }
 
-      const cols = Math.max(2, Math.ceil(W / CELL_SIZE)) + 1;
-      const rows = Math.max(2, Math.ceil(H / CELL_SIZE)) + 1;
+      const cols = Math.max(2, Math.ceil(W / cell)) + 1;
+      const rows = Math.max(2, Math.ceil(H / cell)) + 1;
       const cellW = W / (cols - 1);
       const cellH = H / (rows - 1);
 
@@ -119,7 +137,16 @@ export default function KineticGrid({ children, className = "" }) {
         pts[row] = [];
         prox[row] = [];
         for (let col = 0; col < cols; col++) {
-          const { pt, proximity } = getWarpedPoint(col * cellW, row * cellH, col, row, mouse, ripples, cols, rows);
+          const { pt, proximity } = getWarpedPoint(
+            col * cellW,
+            row * cellH,
+            col,
+            row,
+            mouse,
+            ripples,
+            cols,
+            rows
+          );
           pts[row][col] = pt;
           prox[row][col] = proximity;
         }
@@ -201,51 +228,72 @@ export default function KineticGrid({ children, className = "" }) {
 
     const setSize = () => {
       const rect = wrapper.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+      // على الموبايل نقلّل الـ DPR شوية عشان الأداء
+      const dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1.5 : 2);
+
+      configRef.current = getGridConfig(window.innerWidth);
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+
+      const ctx = canvas.getContext("2d");
+      if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
       sizeRef.current = { w: rect.width, h: rect.height };
     };
+
     setSize();
 
     // بيراقب حجم الـ wrapper نفسه (السيكشن) مش الشاشة كلها
     const resizeObserver = new ResizeObserver(setSize);
     resizeObserver.observe(wrapper);
 
-    if (reduceMotion) return () => resizeObserver.disconnect();
+    if (reduceMotion) {
+      draw(performance.now());
+      return () => resizeObserver.disconnect();
+    }
 
-    // المستمعين على الـ wrapper (السيكشن) عشان الحركة تشتغل بس هنا،
-    // وبيتصعدوا (bubble) صح من فوق أي محتوى جواه زي الكاروسيل والعنوان
-    const onMouseMove = (e) => {
+    const onPointerMove = (e) => {
+      // اللمس بيتجاهل الـ warp عشان ما يتعارضش مع السحب والسكرول
+      if (e.pointerType === "touch") return;
       const rect = wrapper.getBoundingClientRect();
       targetMouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
-    const onMouseLeave = () => {
+    const onPointerLeave = () => {
       targetMouseRef.current = { x: -9999, y: -9999 };
     };
-    const onClick = (e) => {
+    const addRipple = (clientX, clientY) => {
       const rect = wrapper.getBoundingClientRect();
       ripplesRef.current.push({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: clientX - rect.left,
+        y: clientY - rect.top,
         radius: 0,
         opacity: 1,
         born: performance.now(),
       });
     };
+    const onClick = (e) => addRipple(e.clientX, e.clientY);
+    const onTouchStart = (e) => {
+      const touch = e.touches[0];
+      if (touch) addRipple(touch.clientX, touch.clientY);
+    };
 
-    wrapper.addEventListener("mousemove", onMouseMove);
-    wrapper.addEventListener("mouseleave", onMouseLeave);
+    wrapper.addEventListener("pointermove", onPointerMove);
+    wrapper.addEventListener("pointerleave", onPointerLeave);
     wrapper.addEventListener("click", onClick);
+    wrapper.addEventListener("touchstart", onTouchStart, { passive: true });
     rafRef.current = requestAnimationFrame(animate);
 
     return () => {
       resizeObserver.disconnect();
-      wrapper.removeEventListener("mousemove", onMouseMove);
-      wrapper.removeEventListener("mouseleave", onMouseLeave);
+      wrapper.removeEventListener("pointermove", onPointerMove);
+      wrapper.removeEventListener("pointerleave", onPointerLeave);
       wrapper.removeEventListener("click", onClick);
+      wrapper.removeEventListener("touchstart", onTouchStart);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [animate]);
+  }, [animate, draw]);
 
   return (
     <div ref={wrapperRef} className={`relative w-full h-full overflow-hidden ${className}`}>
@@ -254,3 +302,4 @@ export default function KineticGrid({ children, className = "" }) {
     </div>
   );
 }
+
