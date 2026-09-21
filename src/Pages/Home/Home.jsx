@@ -13,14 +13,20 @@ import TimelineSection from "../../Components/TimelineSection/TimelineSection";
 export default function Home() {
   return (
     <FlowScroll aria-label="Home Sections">
-      {/* HERO — بقى جوه الـ FlowScroll دلوقتي عشان ياخد تأثير الدخول/الثبات */}
+     
       <FlowSection aria-label="Hero" className="bg-[#404041]">
         <Hero />
       </FlowSection>
 
       {/* ABOUT */}
       <FlowSection aria-label="About" className="bg-[#F8F9FD]">
-        <BricksAccentBackground backgroundColor="#F8F9FD" opacity={0.4}>
+        <BricksAccentBackground
+          backgroundColor="#F8F9FD"
+          showMortar={false}
+          opacity={1}
+          rows={5}
+          edgeWidth={250}
+        >
           <AboutSection />
         </BricksAccentBackground>
       </FlowSection>

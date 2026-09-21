@@ -300,8 +300,8 @@ export default function AboutSection() {
   return (
     <section className="w-full py-24 px-4 overflow-hidden relative" id="about">
       {/* عناصر ديكور خلفية */}
-      <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-[#1F3888]/5 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-[#D98A2B]/10 blur-3xl pointer-events-none" />
+      <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-[#D3D6E2]/5 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-[#D3D6E2]/10 blur-3xl pointer-events-none" />
 
       <motion.div
         className="container mx-auto max-w-6xl relative z-10"

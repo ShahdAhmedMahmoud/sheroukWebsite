@@ -80,15 +80,29 @@ export default function FlowScroll({ children, className, "aria-label": ariaLabe
 
         // كل section (ما عدا الأخير) بيتثبت لحد ما اللي بعده يغطيه بالكامل
         if (i < sections.length - 1) {
-          triggers.push(
-            ScrollTrigger.create({
-              trigger: section,
-              start: "bottom bottom",
-              end: "bottom top",
-              pin: true,
-              pinSpacing: false,
-            })
+          const holdDistance = Number(
+            section.querySelector("[data-flow-hold]")?.dataset.flowHold || 0
           );
+          const pinTrigger = ScrollTrigger.create({
+            trigger: section,
+            start: "bottom bottom",
+            end: holdDistance ? `bottom top-=${holdDistance}` : "bottom top",
+            pin: true,
+            pinSpacing: false,
+            onEnter: () => {
+              if (holdDistance) gsap.set(section, { zIndex: sections.length + 1 });
+            },
+            onLeave: () => {
+              if (holdDistance) gsap.set(section, { zIndex: i + 1 });
+            },
+            onEnterBack: () => {
+              if (holdDistance) gsap.set(section, { zIndex: sections.length + 1 });
+            },
+            onLeaveBack: () => {
+              if (holdDistance) gsap.set(section, { zIndex: i + 1 });
+            },
+          });
+          triggers.push(pinTrigger);
         }
       });
 

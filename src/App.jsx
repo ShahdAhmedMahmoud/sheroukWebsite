@@ -13,7 +13,7 @@ export default function App() {
   return (
     <BrowserRouter>
     <ScrollToTop />
-    <CursorSpotlight />
+    {/* <CursorSpotlight /> */}
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />

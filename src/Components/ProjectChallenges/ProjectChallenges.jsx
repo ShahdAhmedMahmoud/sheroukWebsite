@@ -219,25 +219,7 @@ export default function ProjectChallenges({
         className
       )}
     >
-      {/* STORYTELLING INTRO */}
-      {/* <div className="relative z-20 mx-auto mb-14 w-full max-w-7xl md:mb-20">
-        <div className="max-w-4xl">
-          <p className="mb-4 text-sm font-bold uppercase tracking-[0.25em] text-[#293A82] sm:text-base">
-            02 / Challenges
-          </p>
 
-          <h2 className="max-w-4xl text-4xl font-black uppercase leading-[0.9] tracking-tighter text-[#373A49] sm:text-5xl md:text-6xl lg:text-7xl">
-            Every project starts
-            <br />
-            with a challenge.
-          </h2>
-
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-[#373A49]/70 sm:text-lg">
-            Before the vision could take shape, the project had to overcome
-            the reality of the site.
-          </p>
-        </div>
-      </div> */}
 
 
      
@@ -253,7 +235,7 @@ export default function ProjectChallenges({
     </p>
 
     {/* Main Header */}
-    <h2 className="overflow-hidden text-xl font-black  leading-[0.8] tracking-[-0.06em] text-[#373A49] sm:text-4xl md:text-8xl lg:text-[50px]">
+    <h2 className=" text-xl font-black  leading-[0.8] tracking-[-0.06em] text-[#373A49] sm:text-4xl md:text-8xl lg:text-[50px]">
       <span
         className="inline-block animate-[challengeTitle_1s_cubic-bezier(0.16,1,0.3,1)_both]"
       >
@@ -336,9 +318,9 @@ export default function ProjectChallenges({
                     </span>
 
                     <div className="min-w-0">
-<h3
+{/* <h3
   className={cn(
-    "text-2xl  leading-[0.95] tracking-tight transition-all duration-700 min-[400px]:text-4xl md:text-5xl xl:text-6xl",
+    "text-xl  leading-[0.95] tracking-tight transition-all duration-700 min-[400px]:text-4xl md:text-5xl xl:text-6xl",
     active
       ? "text-[#373A49] opacity-100 md:translate-x-4"
       : "text-transparent opacity-50 [-webkit-text-stroke:1.5px_#373A49] md:translate-x-0"
@@ -347,7 +329,20 @@ export default function ProjectChallenges({
                         {item.title[0]}
                         <br />
                         {item.title[1]}
-                      </h3>
+                      </h3> */}
+
+                      <h3
+  className={cn(
+    "leading-[0.95] tracking-tight transition-all duration-700",
+    active
+      ? "text-2xl min-[400px]:text-4xl md:text-5xl xl:text-6xl text-[#373A49] opacity-100 md:translate-x-4"
+      : "text-lg min-[400px]:text-2xl md:text-3xl xl:text-4xl text-transparent opacity-50 [-webkit-text-stroke:1.5px_#373A49] md:translate-x-0"
+  )}
+>
+  {item.title[0]}
+  <br />
+  {item.title[1]}
+</h3>
 
                       {/* Description opens under the active title */}
                       <div
