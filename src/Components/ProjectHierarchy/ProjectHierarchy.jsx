@@ -606,7 +606,7 @@ export default function ProjectHierarchy({ project }) {
         relative
         w-full
         overflow-hidden
-        bg-[#425073]
+        bg-[#1E2432]
         px-4
         py-14
         sm:px-6

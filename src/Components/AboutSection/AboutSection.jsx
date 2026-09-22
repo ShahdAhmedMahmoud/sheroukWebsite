@@ -319,7 +319,7 @@ export default function AboutSection() {
             About Us
           </h2>
           <motion.div
-            className="w-24 h-1 bg-[#1F3888] mt-4"
+            className="w-24 h-1 bg-[#2A317A] mt-4"
             initial={{ width: 0 }}
             whileInView={{ width: 96 }}
             viewport={{ once: true }}
@@ -339,7 +339,7 @@ export default function AboutSection() {
         <motion.div variants={itemVariants} className="text-center mb-16">
           <a
             href="/about"
-            className="text-[#1F3888] font-semibold hover:underline"
+            className="text-[#2A317A] font-semibold hover:underline"
           >
             Learn more about us →
           </a>
@@ -370,7 +370,7 @@ export default function AboutSection() {
               </motion.div>
               <div className="absolute inset-0 border-4 border-[#D98A2B] rounded-2xl -m-3 -z-10" />
               <motion.div
-                className="absolute -top-4 -right-6 w-16 h-16 rounded-full bg-[#1F3888]/10"
+                className="absolute -top-4 -right-6 w-16 h-16 rounded-full bg-[#2A317A]/10"
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -412,7 +412,7 @@ export default function AboutSection() {
 
         {/* CTA */}
         <motion.div
-          className="mt-20 bg-[#1F3888] text-white p-8 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left"
+          className="mt-20 bg-[#2A317A] text-white p-8 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}

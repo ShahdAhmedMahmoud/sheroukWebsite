@@ -24,7 +24,7 @@ const slides = [
   },
 ];
 
-const AUTOPLAY_MS = 6000;
+const AUTOPLAY_MS = 10000;
 
 export default function Hero() {
   const [activeIndex, setActiveIndex] = useState(0);

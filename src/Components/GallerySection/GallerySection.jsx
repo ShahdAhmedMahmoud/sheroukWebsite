@@ -9,7 +9,7 @@ import gsap from "gsap";
 const COLORS = {
   navy: "#293A82",
   white: "#FFFFFF",
-  charcoal: "#373A49",
+  charcoal: "#1E2432",
 };
 
 

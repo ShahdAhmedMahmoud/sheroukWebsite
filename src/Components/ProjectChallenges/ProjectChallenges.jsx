@@ -214,7 +214,7 @@ export default function ProjectChallenges({
     <section
       ref={sectionRef}
       className={cn(
-        "relative w-full overflow-hidden bg-[#D2D5E2]/30",
+        "relative w-full overflow-hidden bg-[#FFFFFF]",
         "px-5 py-14 sm:px-8 md:px-14 md:py-24 lg:px-24",
         className
       )}

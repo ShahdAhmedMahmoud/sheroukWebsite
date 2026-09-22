@@ -1,16 +1,21 @@
 
-
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
+import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
+import { useLanguage } from "../../Context/LanguageContext/LanguageContext";
+
+// كل عنصر بقى ليه "key" بدل نص ثابت، عشان نقدر نترجمه بـ t(item.key)
 const navItems = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Projects", href: "/projects" },
-  { label: "Timeline", href: "#timeline" },
-  { label: "Testimonials", href: "#testimonials" },
-  { label: "Contact", href: "#contact" },
+  { key: "navHome", href: "/" },
+  { key: "navAbout", href: "#about" },
+  { key: "navServices", href: "#services" },
+  { key: "navProjects", href: "/projects" },
+  { key: "navCareer", href: "/careers" },
+  { key: "navBim", href: "/bim" },
+  { key: "navSuppliers", href: "/suppliers" },
+  { key: "navContact", href: "#contact" },
+  { key: "navNews", href: "/news" },
 ];
 
 function usePrefersReducedMotion() {
@@ -34,6 +39,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const reduceMotion = usePrefersReducedMotion();
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     let ticking = false;
@@ -111,14 +117,14 @@ export default function Navbar() {
             ${
               scrolled
                 ? "gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5"
-                : "gap-3 sm:gap-5 md:gap-7 px-3 sm:px-5 md:px-6 py-2.5 sm:py-3"
+                : "gap-3 sm:gap-5 lg:gap-7 px-3 sm:px-5 md:px-6 py-2.5 sm:py-3"
             }
           `}
         >
           {/* ================= LOGO / MENU BUTTON ================= */}
           <motion.button
             onClick={() => setMenuOpen((p) => !p)}
-            aria-label={menuOpen ? "قفل القائمة" : "فتح القائمة"}
+            aria-label={menuOpen ? t("menuCloseLabel") : t("menuOpenLabel")}
             className="
               group
               relative
@@ -307,7 +313,7 @@ export default function Navbar() {
                 -bottom-4
                 left-1/2
                 -translate-x-1/2
-                text-[9px]
+                text-[16px]
                 tracking-[0.2em]
                 uppercase
                 text-[#6C757D]
@@ -322,7 +328,11 @@ export default function Navbar() {
           <AnimatePresence>
             {!scrolled && (
               <motion.ul
+                key={language}
                 initial={{
+                  opacity: 0,
+                }}
+                animate={{
                   opacity: 1,
                 }}
                 exit={{
@@ -331,9 +341,10 @@ export default function Navbar() {
                     duration: 0.2,
                   },
                 }}
+                transition={{ duration: 0.3 }}
                 className="
                   hidden
-                  md:flex
+                  lg:flex
                   items-center
                   gap-4
                   lg:gap-7
@@ -341,15 +352,15 @@ export default function Navbar() {
               >
                 {navItems.map((item) => (
                   <li
-                    key={item.label}
+                    key={item.key}
                     className="relative group"
                   >
                     <a
                       href={item.href}
                       className="
-                        text-xs
-                        lg:text-sm
-                        font-semibold
+                        text-[16px]
+                        lg:text-[16px]
+                        font-medium
                         tracking-wide
                         text-[#404041]
                         group-hover:text-[#1F3888]
@@ -361,7 +372,7 @@ export default function Navbar() {
                         whitespace-nowrap
                       "
                     >
-                      {item.label}
+                      {t(item.key)}
                     </a>
 
                     <span
@@ -384,6 +395,11 @@ export default function Navbar() {
               </motion.ul>
             )}
           </AnimatePresence>
+
+          {/* ================= LANGUAGE SWITCHER (ثابت مع الـ navbar دايمًا) ================= */}
+          <div className="shrink-0 pl-1 sm:pl-2 border-l border-[#1F3888]/10">
+            <LanguageSwitcher />
+          </div>
         </motion.nav>
       </header>
 
@@ -532,6 +548,17 @@ export default function Navbar() {
               border-[#D98A2B]
             " />
 
+            {/* Language switcher - visible while the full menu is open too */}
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="absolute top-5 sm:top-8 left-1/2 -translate-x-1/2 z-10"
+            >
+              <LanguageSwitcher />
+            </motion.div>
+
             {/* Menu links */}
             <ul
               className="
@@ -544,49 +571,57 @@ export default function Navbar() {
                 sm:gap-4
               "
             >
-              {navItems.map((item, i) => (
-                <motion.li
-                  key={item.label}
-                  initial={{
-                    opacity: 0,
-                    y: 30,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  exit={{
-                    opacity: 0,
-                    y: 20,
-                  }}
-                  transition={{
-                    duration: 0.5,
-                    delay: reduceMotion ? 0 : i * 0.08,
-                    ease: "easeOut",
-                  }}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={language}
+                  initial={{ opacity: 1 }}
+                  className="flex flex-col items-center gap-3 sm:gap-4"
                 >
-                  <a
-                    href={item.href}
-                    onClick={() => setMenuOpen(false)}
-                    className="
-                      text-3xl
-                      xs:text-4xl
-                      sm:text-5xl
-                      md:text-6xl
-                      font-bold
-                      uppercase
-                      tracking-tight
-                      text-[#404041]
-                      hover:text-[#1F3888]
-                      transition-colors
-                      duration-300
-                      text-center
-                    "
-                  >
-                    {item.label}
-                  </a>
-                </motion.li>
-              ))}
+                  {navItems.map((item, i) => (
+                    <motion.li
+                      key={item.key}
+                      initial={{
+                        opacity: 0,
+                        y: 30,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      exit={{
+                        opacity: 0,
+                        y: 20,
+                      }}
+                      transition={{
+                        duration: 0.5,
+                        delay: reduceMotion ? 0 : i * 0.08,
+                        ease: "easeOut",
+                      }}
+                    >
+                      <a
+                        href={item.href}
+                        onClick={() => setMenuOpen(false)}
+                        className="
+                          text-xl
+                          xs:text-xl
+                          sm:text-2xl
+                          md:text-3xl
+                          font-bold
+                          uppercase
+                          tracking-tight
+                          text-[#404041]
+                          hover:text-[#1F3888]
+                          transition-colors
+                          duration-300
+                          text-center
+                        "
+                      >
+                        {t(item.key)}
+                      </a>
+                    </motion.li>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
             </ul>
 
             {/* Footer text */}

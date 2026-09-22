@@ -41,7 +41,7 @@ export default function ProjectHero({ project }) {
   const isFinished = project.status?.toLowerCase() === "finished";
 
   return (
-    <section className="relative h-[80vh] w-full overflow-hidden bg-[#373A48]">
+    <section className="relative h-[80vh] w-full overflow-hidden ">
       {/* خلفية الصورة / السلايدر */}
       <AnimatePresence mode="sync">
         <motion.div

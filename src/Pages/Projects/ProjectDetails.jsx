@@ -19,15 +19,15 @@ export default function ProjectDetails() {
 
   return (
     <FlowScroll aria-label="Project Details">
-      <FlowSection aria-label="Project Hero" className="bg-[#373A48]">
+      <FlowSection aria-label="Project Hero" className="">
         <ProjectHero project={project} />
       </FlowSection>
 
-      <FlowSection aria-label="Project Vision" className="bg-[#1C1E27]">
+      <FlowSection aria-label="Project Vision" className="bg-[#1E2432]">
         <VisionShowcase />
       </FlowSection>
 
-      <FlowSection aria-label="Project Challenges" className="bg-[#D2D5E2]">
+      <FlowSection aria-label="Project Challenges" className="bg-[#1E2432]">
         <ProjectChallenges />
       </FlowSection>
 
@@ -37,7 +37,7 @@ export default function ProjectDetails() {
         </FlowSection>
       )}
 
-      <FlowSection aria-label="Project Hierarchy" className="bg-[#425073]">
+      <FlowSection aria-label="Project Hierarchy" className="bg-[#FFFFFF]">
         <ProjectHierarchy project={project} />
       </FlowSection>
 

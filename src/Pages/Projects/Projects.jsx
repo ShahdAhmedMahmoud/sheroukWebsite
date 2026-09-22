@@ -2,11 +2,11 @@ import React from 'react'
 
 import ProjectsHero from '../../Components/ProjectsHero/ProjectsHero'
 import SectorFilterSection from '../../Components/SectorFilterSection/SectorFilterSection'
-import SiteHoardingDivider from '../../Components/SiteHoardingDivider/SiteHoardingDivider'
-import ProjectsRevealTransition from '../../Components/ProjectsRevealTransition/ProjectsRevealTransition'
+
 import FlowScroll, { FlowSection } from '../../Components/FlowScroll/FlowScroll'
 import ProjectsCTASection from '../../Components/Projectsctasection/Projectsctasection'
-import ProjectBeforeAfter from '../../Components/ProjectBeforeAfter/ProjectBeforeAfter'
+import SawCutHeroSection from '../../Components/SawCutHeroSection/SawCutHeroSection'
+
 
 export default function Projects() {
   return<>

@@ -1,33 +1,56 @@
-
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { HardHat, ArrowRight, PhoneCall } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/* =========================================================================
+   BuildNext · Saw-Cut Hero (React port)
+   -------------------------------------------------------------------------
+   Ported from the vanilla "cut-scene" hero: a saw slides in, plunges down a
+   jagged vertical line, and the section splits into two pieces that pull
+   apart — with dust, sparks and concrete chips thrown as it cuts.
 
+   Palette pulled from the project's CTA section:
+     yellow  #FFBF00   accent / blade sparks
+     navy    #1F3888   cool accent (guard, corner details)
+     ink     #1E2432   section background
+     paper   #F8F9FD   page background around the section
 
-const LINE_TOPS = ["top-[12%]", "top-[32%]", "top-[52%]", "top-[72%]", "top-[90%]"];
+   Driven by GSAP + ScrollTrigger (matches the rest of the project) instead
+   of a manual rAF loop — a single proxy tween drives `sample()` + `render()`
+   exactly the way the vanilla controller's timeline did.
+   ========================================================================= */
 
-const COLORS = { yellow: "#FFBF00", yellowHi: "#ffd76a", navy: "#1F3888", ink: "#1E2432" };
+/* ---------- Config ---------- */
 
-const SAW = { anchorX: 110, anchorY: 500, bladeR: 90, boxH: 600 };
-
-const TIMING = {
-  approach: 1.0,
-  align: 0.2,
-  plungePerPx: 0.0035,
-  plungeMin: 1.5,
-  plungeMax: 3.0,
-  hold: 0.18,
-  lift: 0.7,
-  exitDelay: 0.45,
-  exit: 0.75,
-  separate: 1.1,
+const COLORS = {
+  yellow: "#FFBF00",
+  yellowHi: "#ffd76a",
+  navy: "#1F3888",
+  ink: "#1E2432",
+  paper: "#F8F9FD",
 };
 
-const FX_MAX_PARTICLES = 200;
+const HERO_PHOTO =
+  "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=2000&q=75";
+
+const SAW = { anchorX: 110, anchorY: 500, bladeR: 90, boxH: 600, boxW: 300 };
+
+const TIMING = {
+  approach: 1.1, // seconds, saw slides in right -> left
+  align: 0.25,
+  plungePerPx: 0.0019,
+  plungeMin: 1.4,
+  plungeMax: 2.4,
+  hold: 0.2,
+  lift: 0.8,
+  exitDelay: 0.5,
+  exit: 0.85,
+  separate: 1.2,
+};
+
+const FX = { maxParticles: 220 };
 
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -47,11 +70,7 @@ const mulberry32 = (seed) => () => {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
 
-const ctaStyles = `
-  @keyframes cta-gridMove { 0% { background-position: 0 0; } 100% { background-position: 50px 50px; } }
-  @keyframes cta-lineMove { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-  @keyframes cta-cornerDraw { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 400; } }
-
+const scopedStyles = `
   @keyframes bnBladeSpin { to { transform: rotate(360deg); } }
   @keyframes bnDustDrift {
     0%   { transform: translate(-50%,-50%) scale(.25); opacity: 0; }
@@ -85,73 +104,21 @@ const ctaStyles = `
     animation: bnChipFly 900ms cubic-bezier(.2,.6,.4,1) forwards;
   }
   .bn-blade-svg { animation: bnBladeSpin .9s linear infinite; animation-play-state: paused; }
-  .bn-saw-cutting .bn-blade-svg { animation-play-state: running; }
-
+  .bn-saw.is-cutting .bn-blade-svg { animation-play-state: running; }
+  .bn-saw.is-visible .bn-blade-svg { animation-play-state: running; }
   @media (prefers-reduced-motion: reduce) {
-    .cta-anim-grid, .cta-anim-line, .cta-anim-corner, .cta-anim-glow, .bn-fx { display: none !important; }
+    .bn-fx { display: none !important; }
   }
 `;
 
-function CtaContent() {
-  return (
-    <div className="mx-auto max-w-3xl text-center">
-      <div className="cta-anim-glow mb-6 inline-flex items-center gap-2 rounded-full border border-[#FFBF00]/30 bg-[#FFBF00]/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.15em]">
-        <HardHat className="h-3.5 w-3.5" />
-        Let's Build Together
-      </div>
-
-      <h2 className="mb-6 text-[clamp(1.9rem,5vw,3.5rem)] font-bold leading-tight sm:mb-8">
-        Ready to break ground
-        <br />
-        <span
-          className="inline-block"
-          style={{
-            backgroundImage: "linear-gradient(45deg, #FFBF00, #ffd76a, #1F3888)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-          }}
-        >
-          on your next landmark?
-        </span>
-      </h2>
-
-      <p className="mx-auto mb-10 max-w-xl text-sm leading-relaxed text-white/55 sm:text-base">
-        From infrastructure to commercial developments across Egypt, our team turns ambitious plans into finished,
-        standing structures. Tell us what you're building — we'll take it from there.
-      </p>
-
-      <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-        <a
-          href="#contact"
-          className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#FFBF00] px-7 py-3 text-sm font-semibold text-[#1E2432] transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(255,191,0,0.25)] active:translate-y-0 sm:w-auto sm:px-9 sm:py-4 sm:text-base"
-        >
-          Start Your Project
-          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-        </a>
-
-        <a
-          href="#contact"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/20 bg-transparent px-7 py-3 text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:border-[#1F3888] hover:bg-[#1F3888]/10 sm:w-auto sm:px-9 sm:py-4 sm:text-base"
-        >
-          <PhoneCall className="h-4 w-4" />
-          Talk to Our Team
-        </a>
-      </div>
-    </div>
-  );
-}
-
-/* =========================================================
-   Detailed saw artwork (recolored to the project palette)
-========================================================= */
+/* ---------- Saw artwork, recolored to the project palette ---------- */
 
 function SawSvg({ id }) {
-  const grad = `cta-bnGrad-${id}`;
-  const hoodGrad = `cta-bnHood-${id}`;
-  const steelGrad = `cta-bnSteel-${id}`;
-  const flangeGrad = `cta-bnFlange-${id}`;
-  const clip = `cta-bnClip-${id}`;
+  const grad = `bnGrad-${id}`;
+  const hoodGrad = `bnHood-${id}`;
+  const steelGrad = `bnSteel-${id}`;
+  const flangeGrad = `bnFlange-${id}`;
+  const clip = `bnClip-${id}`;
 
   return (
     <svg viewBox="0 0 300 600" className="absolute inset-0 h-full w-full" aria-hidden="true">
@@ -181,6 +148,7 @@ function SawSvg({ id }) {
         </clipPath>
       </defs>
 
+      {/* body */}
       <g>
         <path d="M150 376 L201 156" stroke="#0c0e10" strokeWidth="11" strokeLinecap="round" fill="none" />
         <path d="M150 376 L201 156" stroke="#6b737b" strokeWidth="7" strokeLinecap="round" fill="none" />
@@ -215,6 +183,7 @@ function SawSvg({ id }) {
         <path d="M128 458h136a20 20 0 0 1-20 12h-96a20 20 0 0 1-20-12z" fill="#15171a" />
       </g>
 
+      {/* front hood + hub, drawn in front of the blade */}
       <g>
         <path d="M13.4 474A100 100 0 0 1 206.6 474Z" fill={`url(#${hoodGrad})`} />
         <path d="M13.4 474A100 100 0 0 1 206.6 474" fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth="2.5" />
@@ -227,6 +196,7 @@ function SawSvg({ id }) {
         <circle cx="110" cy="500" r="2.6" fill="#22190a" />
       </g>
 
+      {/* blade, behind the hub cap, in front of the body */}
       <g transform="translate(20 410)">
         <g className="bn-blade-svg" style={{ transformOrigin: "90px 90px" }}>
           <circle cx="90" cy="90" r="83" fill="none" stroke="#2b3035" strokeWidth="14" strokeDasharray="21 5.07" />
@@ -243,19 +213,52 @@ function SawSvg({ id }) {
   );
 }
 
-/* =========================================================
-   MAIN SECTION
-========================================================= */
+/* ---------- Hero content (rendered 3x: source + inside each cut piece) ---------- */
 
-export default function ProjectsCTASection() {
+function HeroCopy({ interactive = true }) {
+  return (
+    <div className="absolute left-6 top-[35%] w-[min(500px,86%)] sm:left-12 md:left-20">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.15em]" style={{ color: COLORS.yellow }}>
+        البناء والتشييد
+      </p>
+      <h1 dir="rtl" lang="ar" className="text-right text-[clamp(2rem,4.3vw,4rem)] font-extrabold leading-[1.12] text-white">
+        <span className="block">بناء اليوم ..</span>
+        <span className="block" style={{ color: COLORS.yellow }}>
+          لمستقبل أقوى
+        </span>
+      </h1>
+      <p dir="rtl" lang="ar" className="mt-4 max-w-[20em] text-right text-sm leading-[1.85] text-white/85 sm:text-base">
+        نقدم لك حلولاً متكاملة في مجال الإنشاءات والتشييد، بجودة عالية وخبرة تمتد لسنوات.
+      </p>
+      <a
+        href="#contact"
+        tabIndex={interactive ? 0 : -1}
+        dir="ltr"
+        className="mt-6 inline-flex items-center gap-3 rounded-lg px-6 py-3 text-sm font-bold text-[#1E2432] transition-transform duration-200 hover:-translate-y-0.5 sm:text-base"
+        style={{ backgroundColor: COLORS.yellow }}
+      >
+        <span dir="rtl" lang="ar">
+          تواصل معنا
+        </span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </a>
+    </div>
+  );
+}
+
+/* ---------- Component ---------- */
+
+export default function SawCutHeroSection() {
   const sectionRef = useRef(null);
   const sourceRef = useRef(null);
 
   const fxRef = useRef(null);
   const sawRef = useRef(null);
   const sawShadowRef = useRef(null);
-  const glowRef = useRef(null);
 
+  const glowRef = useRef(null);
   const cutLineRef = useRef(null);
   const cutGapRef = useRef(null);
 
@@ -273,19 +276,6 @@ export default function ProjectsCTASection() {
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    /* ---- initial, pre-animation state (plain styles — nothing depends on
-       conditional Tailwind classes for correctness) ---- */
-    if (sawRef.current) sawRef.current.style.opacity = "0";
-    if (pieceLeftRef.current) pieceLeftRef.current.style.opacity = "0";
-    if (pieceRightRef.current) pieceRightRef.current.style.opacity = "0";
-    if (glowRef.current) glowRef.current.style.opacity = "0";
-    if (sourceRef.current) sourceRef.current.style.opacity = "1";
-
-    if (reduceMotion) {
-      // static fallback: keep the intact content, no cut
-      return undefined;
-    }
-
     const geo = { W: 0, H: 0, cutX: 0, scale: 1, R: SAW.bladeR, kerf: 6, HR: 640, sepX: 40 };
     const Edges = { L: [], R: [] };
     const pt = (p) => `${p[0].toFixed(1)}px ${p[1].toFixed(1)}px`;
@@ -293,23 +283,24 @@ export default function ProjectsCTASection() {
     function measure() {
       geo.W = section.clientWidth;
       geo.H = section.clientHeight;
-      geo.cutX = Math.round(geo.W * 0.62);
-      geo.scale = clamp(geo.W / 1450, 0.42, 0.85);
+      const cutPct = geo.W < 640 ? 0.74 : geo.W < 1024 ? 0.66 : 0.62;
+      geo.cutX = Math.round(geo.W * cutPct);
+      geo.scale = clamp(geo.W / 1450, 0.58, 1.05);
       geo.R = SAW.bladeR * geo.scale;
-      geo.kerf = Math.max(4, Math.round(6 * geo.scale));
-      geo.HR = Math.ceil(SAW.boxH * geo.scale + 30);
-      geo.sepX = clamp(geo.W * 0.035, 10, 60);
+      geo.kerf = Math.max(5, Math.round(6 * geo.scale));
+      geo.HR = Math.ceil(SAW.boxH * geo.scale + 40);
+      geo.sepX = clamp(geo.W * 0.045, 14, 90);
       if (fxRef.current) {
         fxRef.current.style.top = `${-geo.HR}px`;
-        fxRef.current.style.bottom = "-90px";
+        fxRef.current.style.bottom = `-150px`;
       }
     }
 
     function buildEdges() {
       const { H, cutX, kerf, scale } = geo;
-      const step = clamp(Math.round(H / 40), 10, 22);
+      const step = clamp(Math.round(H / 44), 12, 26);
       const rnd = mulberry32(20260921);
-      const amp = Math.min(kerf / 2 - 0.5, 1 + 1.1 * scale);
+      const amp = Math.min(kerf / 2 - 0.6, 1.1 + 1.3 * scale);
       Edges.L = [];
       Edges.R = [];
       for (let y = 0; ; y += step) {
@@ -341,17 +332,14 @@ export default function ProjectsCTASection() {
     function separatePieces(p) {
       const dx = geo.sepX * easeOutBack(p, 0.9);
       const e = easeOutCubic(p);
-      const lean = 0.3 * e;
+      const lean = 0.32 * e;
       if (pieceLeftRef.current) {
-        pieceLeftRef.current.style.opacity = "1";
-        pieceLeftRef.current.style.transform = `translate3d(${(-dx).toFixed(2)}px, ${(5 * geo.scale * e).toFixed(2)}px, 0) rotate(${(-lean).toFixed(3)}deg)`;
+        pieceLeftRef.current.style.transform = `translate3d(${(-dx).toFixed(2)}px, ${(6 * geo.scale * e).toFixed(2)}px, 0) rotate(${(-lean).toFixed(3)}deg)`;
       }
       if (pieceRightRef.current) {
-        pieceRightRef.current.style.opacity = "1";
         pieceRightRef.current.style.transform = `translate3d(${dx.toFixed(2)}px, ${(-3 * geo.scale * e).toFixed(2)}px, 0) rotate(${lean.toFixed(3)}deg)`;
       }
-      if (glowRef.current) glowRef.current.style.opacity = clamp(p * 1.4).toFixed(3);
-      if (sourceRef.current) sourceRef.current.style.opacity = `${1 - Math.min(1, p * 4)}`;
+      if (glowRef.current) glowRef.current.style.opacity = clamp(p * 1.6).toFixed(3);
     }
 
     function placeSaw(f) {
@@ -359,22 +347,23 @@ export default function ProjectsCTASection() {
       const cy = f.tip - geo.R + geo.HR;
       const tx = f.x + f.jx - SAW.anchorX;
       const ty = cy + f.jy - SAW.anchorY;
-      sawRef.current.style.opacity = "1";
       sawRef.current.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${(f.rot + f.jr).toFixed(3)}deg) scale(${geo.scale.toFixed(3)})`;
-      sawRef.current.classList.toggle("bn-saw-cutting", f.contact);
+      sawRef.current.classList.add("is-visible");
+      sawRef.current.classList.toggle("is-cutting", f.contact);
       if (sawShadowRef.current) {
-        const off = lerp(7, 36, f.depth);
+        const off = lerp(8, 44, f.depth);
         sawShadowRef.current.style.transform = `translate3d(${(off * 0.7).toFixed(1)}px, ${off.toFixed(1)}px, 0)`;
-        sawShadowRef.current.style.opacity = lerp(0.5, 0.28, f.depth).toFixed(2);
+        sawShadowRef.current.style.opacity = lerp(0.55, 0.32, f.depth).toFixed(2);
       }
     }
 
     function hideSaw() {
       if (!sawRef.current) return;
-      sawRef.current.style.opacity = "0";
-      sawRef.current.classList.remove("bn-saw-cutting");
+      sawRef.current.classList.remove("is-visible", "is-cutting");
+      sawRef.current.style.transform = "";
     }
 
+    /* particles */
     const particleCount = () =>
       (dustLayerRef.current?.childElementCount || 0) + (sparkLayerRef.current?.childElementCount || 0);
     const spawnInto = (layer, el, life) => {
@@ -384,30 +373,30 @@ export default function ProjectsCTASection() {
     };
     function spawnDust(x, y, boost = 1, rise = false) {
       const s = geo.scale;
-      const size = rand(24, 66) * s * boost;
-      const life = rand(900, 1700);
-      const dy = (rise ? rand(-100, -24) : rand(-50, 120)) * s;
+      const size = rand(34, 92) * s * boost;
+      const life = rand(1000, 1900);
+      const dy = (rise ? rand(-120, -30) : rand(-60, 150)) * s;
       const el = document.createElement("i");
       el.className = "bn-dust";
-      el.style.cssText = `left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;width:${size.toFixed(0)}px;height:${size.toFixed(0)}px;--dx:${(rand(-120, 60) * s).toFixed(0)}px;--dy:${dy.toFixed(0)}px;--s:${rand(1.5, 2.6).toFixed(2)};--o:${rand(0.26, 0.56).toFixed(2)};animation-duration:${life.toFixed(0)}ms`;
+      el.style.cssText = `left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;width:${size.toFixed(0)}px;height:${size.toFixed(0)}px;--dx:${(rand(-150, 70) * s).toFixed(0)}px;--dy:${dy.toFixed(0)}px;--s:${rand(1.6, 2.9).toFixed(2)};--o:${rand(0.28, 0.62).toFixed(2)};animation-duration:${life.toFixed(0)}ms`;
       spawnInto(dustLayerRef.current, el, life);
     }
     function spawnChip(x, y) {
       const s = geo.scale;
-      const life = rand(650, 1000);
+      const life = rand(700, 1100);
       const ang = (rand(-30, 210) * Math.PI) / 180;
-      const d = rand(24, 96) * s;
+      const d = rand(30, 120) * s;
       const el = document.createElement("i");
       el.className = "bn-chip";
-      el.style.cssText = `left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;width:${(rand(3, 6) * s).toFixed(1)}px;height:${(rand(3, 5) * s).toFixed(1)}px;--x1:${(Math.cos(ang) * d * 0.6).toFixed(0)}px;--y1:${(Math.sin(ang) * d * 0.6 - 8 * s).toFixed(0)}px;--x2:${(Math.cos(ang) * d).toFixed(0)}px;--y2:${(Math.sin(ang) * d + rand(60, 170) * s).toFixed(0)}px;--r:${rand(-500, 500).toFixed(0)}deg;animation-duration:${life.toFixed(0)}ms`;
+      el.style.cssText = `left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;width:${(rand(3, 7) * s).toFixed(1)}px;height:${(rand(3, 6) * s).toFixed(1)}px;--x1:${(Math.cos(ang) * d * 0.6).toFixed(0)}px;--y1:${(Math.sin(ang) * d * 0.6 - 10 * s).toFixed(0)}px;--x2:${(Math.cos(ang) * d).toFixed(0)}px;--y2:${(Math.sin(ang) * d + rand(80, 220) * s).toFixed(0)}px;--r:${rand(-540, 540).toFixed(0)}deg;animation-duration:${life.toFixed(0)}ms`;
       spawnInto(dustLayerRef.current, el, life);
     }
     function spawnSpark(x, y) {
       const s = geo.scale;
-      const life = rand(340, 740);
+      const life = rand(380, 820);
       const a = ((Math.random() < 0.78 ? rand(160, 275) : rand(-40, 30)) * Math.PI) / 180;
-      const dist = rand(56, 190) * s;
-      const g = rand(48, 150) * s;
+      const dist = rand(70, 230) * s;
+      const g = rand(60, 190) * s;
       const x1 = Math.cos(a) * dist * 0.55;
       const y1 = Math.sin(a) * dist * 0.55 + g * 0.08;
       const x2 = Math.cos(a) * dist;
@@ -415,7 +404,7 @@ export default function ProjectsCTASection() {
       const rot = (Math.atan2(x1, -y1) * 180) / Math.PI;
       const el = document.createElement("i");
       el.className = "bn-spark";
-      el.style.cssText = `left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;height:${(rand(8, 18) * s).toFixed(1)}px;--x1:${x1.toFixed(0)}px;--y1:${y1.toFixed(0)}px;--x2:${x2.toFixed(0)}px;--y2:${y2.toFixed(0)}px;--rot:${rot.toFixed(1)}deg;animation-duration:${life.toFixed(0)}ms`;
+      el.style.cssText = `left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;height:${(rand(9, 22) * s).toFixed(1)}px;--x1:${x1.toFixed(0)}px;--y1:${y1.toFixed(0)}px;--x2:${x2.toFixed(0)}px;--y2:${y2.toFixed(0)}px;--rot:${rot.toFixed(1)}deg;animation-duration:${life.toFixed(0)}ms`;
       spawnInto(sparkLayerRef.current, el, life);
     }
     function clearParticles() {
@@ -423,9 +412,10 @@ export default function ProjectsCTASection() {
       if (sparkLayerRef.current) sparkLayerRef.current.textContent = "";
     }
 
+    /* sample(t): pure function of seconds -> saw pose, mirrors the vanilla controller */
     let T = null;
     function timings() {
-      const plunge = clamp(geo.H * TIMING.plungePerPx + 0.15, TIMING.plungeMin, TIMING.plungeMax);
+      const plunge = clamp(geo.H * TIMING.plungePerPx + 0.2, TIMING.plungeMin, TIMING.plungeMax);
       const approachEnd = TIMING.approach;
       const plungeStart = approachEnd + TIMING.align;
       const plungeEnd = plungeStart + plunge;
@@ -443,11 +433,11 @@ export default function ProjectsCTASection() {
 
     function sample(t) {
       const { W, H, cutX, scale } = geo;
-      const hover = 26 * scale;
-      const over = 8 * scale;
-      const xIn = W + 200 * scale;
-      const xOut = -260 * scale;
-      const bob = Math.sin(t * 6.5) * 1.8 * scale;
+      const hover = 34 * scale;
+      const over = 10 * scale;
+      const xIn = W + 230 * scale;
+      const xOut = -320 * scale;
+      const bob = Math.sin(t * 6.5) * 2.2 * scale;
 
       let x = cutX;
       let tip = -hover;
@@ -458,7 +448,7 @@ export default function ProjectsCTASection() {
       if (t < T.approachEnd) {
         const p = t / T.approachEnd;
         x = lerp(xIn, cutX, easeOutQuart(p));
-        lean = -3.2 * Math.pow(1 - p, 3) + Math.sin(p * 20) * 0.5 * Math.pow(1 - p, 2);
+        lean = -3.4 * Math.pow(1 - p, 3) + Math.sin(p * 20) * 0.5 * Math.pow(1 - p, 2);
         tip = -hover + bob;
       } else if (t < T.plungeStart) {
         tip = -hover + bob;
@@ -473,16 +463,16 @@ export default function ProjectsCTASection() {
         if (lp >= 1) tip += bob;
         const ep = clamp((t - T.exitStart) / TIMING.exit);
         x = lerp(cutX, xOut, easeInCubic(ep));
-        lean = -3.4 * ep;
+        lean = -3.6 * ep;
       }
 
-      const bite = contact ? clamp((tip + 2 * scale) / (22 * scale)) : 0;
+      const bite = contact ? clamp((tip + 2 * scale) / (26 * scale)) : 0;
       const vib = contact ? 0.3 + 0.7 * bite : idle;
-      const jx = (Math.sin(t * 93) + 0.6 * Math.sin(t * 217 + 1.3) + 0.4 * Math.sin(t * 510)) * 1.1 * vib * scale;
-      const jy = (Math.sin(t * 117 + 0.6) + 0.5 * Math.sin(t * 290)) * 0.8 * vib * scale;
-      const jr = (Math.sin(t * 131 + 2.1) + 0.5 * Math.sin(t * 370)) * 0.26 * vib;
+      const jx = (Math.sin(t * 93) + 0.6 * Math.sin(t * 217 + 1.3) + 0.4 * Math.sin(t * 510)) * 1.2 * vib * scale;
+      const jy = (Math.sin(t * 117 + 0.6) + 0.5 * Math.sin(t * 290)) * 0.9 * vib * scale;
+      const jr = (Math.sin(t * 131 + 2.1) + 0.5 * Math.sin(t * 370)) * 0.28 * vib;
 
-      return { x, tip, rot: lean, jx, jy, jr, contact, depth: clamp(1 - (tip + 4 * scale) / (40 * scale)) };
+      return { x, tip, rot: lean, jx, jy, jr, contact, depth: clamp(1 - (tip + 4 * scale) / (46 * scale)) };
     }
 
     let maxTip = -1e9;
@@ -498,42 +488,42 @@ export default function ProjectsCTASection() {
 
     function emit(f, dt, sepP) {
       const { H, HR, cutX, scale } = geo;
-      const busy = particleCount() > FX_MAX_PARTICLES;
+      const busy = particleCount() > FX.maxParticles;
       const step = (acc, perSec) => acc + (dt * perSec) / 1000;
 
       if (f.contact && !busy) {
         const tipY = clamp(f.tip, 0, H + 6 * scale) + HR;
-        const px = () => cutX + rand(-4, 4) * scale;
+        const px = () => cutX + rand(-5, 5) * scale;
 
         if (!wasContact) {
-          for (let i = 0; i < 12; i++) spawnDust(cutX + rand(-8, 8) * scale, tipY, 1.1);
-          for (let i = 0; i < 10; i++) spawnSpark(cutX, tipY);
+          for (let i = 0; i < 14; i++) spawnDust(cutX + rand(-10, 10) * scale, tipY, 1.15);
+          for (let i = 0; i < 12; i++) spawnSpark(cutX, tipY);
         }
         if (!bottomBurst && f.tip >= H) {
           bottomBurst = true;
-          for (let i = 0; i < 14; i++) spawnDust(cutX + rand(-12, 12) * scale, tipY, 1.25);
-          for (let i = 0; i < 12; i++) spawnSpark(cutX, tipY);
+          for (let i = 0; i < 16; i++) spawnDust(cutX + rand(-14, 14) * scale, tipY, 1.3);
+          for (let i = 0; i < 14; i++) spawnSpark(cutX, tipY);
         }
 
-        dustAcc = step(dustAcc, 66);
+        dustAcc = step(dustAcc, 78);
         while (dustAcc >= 1) {
           spawnDust(px(), tipY, 1);
           dustAcc--;
         }
-        sparkAcc = step(sparkAcc, 52);
+        sparkAcc = step(sparkAcc, 62);
         while (sparkAcc >= 1) {
           spawnSpark(cutX + rand(-3, 3) * scale, tipY);
           sparkAcc--;
         }
-        chipAcc = step(chipAcc, 13);
+        chipAcc = step(chipAcc, 16);
         while (chipAcc >= 1) {
           spawnChip(px(), tipY);
           chipAcc--;
         }
-        if (f.tip > 50 * scale) {
-          mouthAcc = step(mouthAcc, 8);
+        if (f.tip > 60 * scale) {
+          mouthAcc = step(mouthAcc, 10);
           while (mouthAcc >= 1) {
-            spawnDust(px(), HR + rand(-2, 5), 0.6, true);
+            spawnDust(px(), HR + rand(-2, 6), 0.7, true);
             mouthAcc--;
           }
         }
@@ -541,9 +531,9 @@ export default function ProjectsCTASection() {
       wasContact = f.contact;
 
       if (split && sepP < 0.4 && !busy) {
-        splitAcc = step(splitAcc, 38);
+        splitAcc = step(splitAcc, 46);
         while (splitAcc >= 1) {
-          spawnDust(cutX + rand(-8, 8) * scale, HR + rand(0.05, 0.95) * H, 0.7);
+          spawnDust(cutX + rand(-10, 10) * scale, HR + rand(0.05, 0.95) * H, 0.8);
           splitAcc--;
         }
       }
@@ -562,14 +552,29 @@ export default function ProjectsCTASection() {
 
       if (!split && t >= T.splitStart) {
         split = true;
-        for (let i = 0; i < 16; i++) spawnDust(geo.cutX + rand(-6, 6) * geo.scale, geo.HR + rand(0.04, 0.96) * geo.H, 0.85);
+        section.classList.add("bn-is-split");
+        for (let i = 0; i < 18; i++) spawnDust(geo.cutX + rand(-8, 8) * geo.scale, geo.HR + rand(0.04, 0.96) * geo.H, 0.9);
       }
       const sepP = split ? clamp((t - T.splitStart) / TIMING.separate) : 0;
       if (split) separatePieces(sepP);
 
       emit(f, dt, sepP);
+    }
 
-      if (t >= T.end) hideSaw();
+    function resetScene() {
+      maxTip = -1e9;
+      split = false;
+      wasContact = false;
+      bottomBurst = false;
+      dustAcc = sparkAcc = chipAcc = mouthAcc = splitAcc = 0;
+      lastEmitT = 0;
+      section.classList.remove("bn-is-split", "bn-is-armed");
+      hideSaw();
+      if (pieceLeftRef.current) pieceLeftRef.current.style.transform = "";
+      if (pieceRightRef.current) pieceRightRef.current.style.transform = "";
+      if (glowRef.current) glowRef.current.style.opacity = "0";
+      drawCut(0);
+      clearParticles();
     }
 
     function layout() {
@@ -580,179 +585,152 @@ export default function ProjectsCTASection() {
 
     const ctx = gsap.context(() => {
       layout();
-      drawCut(0);
+      resetScene();
+
+      if (reduceMotion) {
+        // static fallback: no cut, just show the intact hero
+        return;
+      }
+
+      section.classList.add("bn-is-armed");
+      T = timings();
+
+      const proxy = { t: 0 };
+      const tween = gsap.to(proxy, {
+        t: T.end,
+        duration: T.end,
+        ease: "none",
+        paused: true,
+        onUpdate: () => render(proxy.t),
+      });
 
       ScrollTrigger.create({
         trigger: section,
-        start: "top 82%",
+        start: "top 78%",
         once: true,
-        onEnter: () => {
-          // re-measure right before playing — the card's height can change
-          // (fonts, images) between mount and the moment it scrolls into view
-          layout();
-          drawCut(0);
-          T = timings();
-          const proxy = { t: 0 };
-          gsap.to(proxy, {
-            t: T.end,
-            duration: T.end,
-            ease: "none",
-            onUpdate: () => render(proxy.t),
-          });
-        },
+        onEnter: () => tween.play(0),
       });
 
       const onResize = () => {
+        // Keep the piece geometry correct on resize; the animation itself
+        // only ever plays once, so we just re-shape whatever state we're in.
         layout();
-        if (split) {
-          separatePieces(1);
-          drawCut(geo.H);
-        } else {
-          drawCut(Math.max(0, maxTip));
-        }
+        if (split) separatePieces(1);
+        drawCut(split ? geo.H : maxTip);
       };
       window.addEventListener("resize", onResize);
-      return () => {
-        window.removeEventListener("resize", onResize);
-        clearParticles();
-      };
+      return () => window.removeEventListener("resize", onResize);
     }, section);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <div className="relative w-full bg-[#F8F9FD] px-3 pb-8 pt-10 sm:px-6 sm:pb-12 sm:pt-14">
-      {/* unclipped "scene": the rounded card below clips its own contents,
-          but this wrapper does NOT, so the saw can travel above/below the
-          card's edges instead of being cut off by its rounded corners */}
-      <div className="relative mx-auto w-full max-w-7xl">
-        <style>{ctaStyles}</style>
+    <section
+      ref={sectionRef}
+      className="relative isolate h-[max(640px,100svh)] w-full overflow-hidden"
+      style={{ backgroundColor: COLORS.ink }}
+      aria-labelledby="bnHeroTitle"
+    >
+      <style>{scopedStyles}</style>
 
-        <section
-          ref={sectionRef}
-          className="relative w-full overflow-hidden rounded-[1.75rem] bg-[#1E2432] py-20 text-white shadow-[0_25px_60px_-20px_rgba(30,36,50,0.45)] sm:rounded-[2.5rem] sm:px-8 sm:py-28"
-        >
+      {/* glow seen through the gap before/while the pieces part */}
+      <div
+        ref={glowRef}
+        className="pointer-events-none absolute inset-y-0 z-0 w-[min(46vw,520px)] opacity-0"
+        style={{
+          left: "calc(62% - min(23vw,260px))",
+          background: `radial-gradient(ellipse 34% 62% at 50% 56%, rgba(255,191,0,.75), rgba(255,140,20,.24) 46%, transparent 74%)`,
+        }}
+      />
 
-        {/* background decoration — stays put, not part of the cut */}
-        <div
-          className="cta-anim-grid absolute inset-0 z-[1] h-full w-full opacity-60"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,191,0,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,191,0,0.07) 1px, transparent 1px)",
-            backgroundSize: "50px 50px",
-            animation: "cta-gridMove 20s linear infinite",
-          }}
-        />
-        <div className="absolute inset-0 z-[1] h-full w-full overflow-hidden">
-          {LINE_TOPS.map((topClass, index) => {
-            const isBlue = index % 2 === 0;
-            return (
-              <div key={topClass} className={`absolute h-[100px] w-full ${topClass}`}>
-                <div className="relative h-0.5 w-full overflow-hidden">
-                  <div
-                    className={`cta-anim-line absolute left-0 top-0 h-full w-full ${
-                      index % 2 !== 0 ? "[animation-direction:reverse] [animation-delay:2s]" : ""
-                    }`}
-                    style={{
-                      animation: "cta-lineMove 4s linear infinite",
-                      background: isBlue
-                        ? "linear-gradient(90deg, transparent 0%, #1F3888 20%, #6d8cf0 50%, #1F3888 80%, transparent 100%)"
-                        : "linear-gradient(90deg, transparent 0%, #FFBF00 20%, #ffe08a 50%, #FFBF00 80%, transparent 100%)",
-                    }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="absolute left-1/2 top-1/2 z-[5] hidden h-[100px] w-[300px] -translate-x-1/2 -translate-y-1/2 md:block">
-          <svg
-            className="cta-anim-corner absolute left-[-150px] top-1/2 h-[60px] w-[120px] -translate-y-1/2"
-            viewBox="0 0 120 60"
-            stroke="#FFBF00"
-            strokeWidth="2"
-            fill="none"
-            strokeDasharray="50"
-            style={{ animation: "cta-cornerDraw 6s linear infinite" }}
-          >
-            <path d="M120 0 L20 0 Q0 0 0 20 L0 60" />
-          </svg>
-          <svg
-            className="cta-anim-corner absolute right-[-150px] top-1/2 h-[60px] w-[120px] -translate-y-1/2 scale-x-[-1]"
-            viewBox="0 0 120 60"
-            stroke="#1F3888"
-            strokeWidth="2"
-            fill="none"
-            strokeDasharray="50"
-            style={{ animation: "cta-cornerDraw 6s linear infinite 3s" }}
-          >
-            <path d="M120 0 L20 0 Q0 0 0 20 L0 60" />
-          </svg>
-        </div>
+      {/* (1) intact source content — hidden once the scene splits */}
+      <div ref={sourceRef} className="absolute inset-0 z-[1] [.bn-is-split_&]:opacity-0">
+        <SectionBackground />
+        <HeroCopy />
+        <h1 id="bnHeroTitle" className="sr-only">
+          بناء اليوم .. لمستقبل أقوى
+        </h1>
+      </div>
 
-        {/* glow through the gap */}
-        <div
-          ref={glowRef}
-          className="pointer-events-none absolute inset-y-0 left-[62%] z-[8] w-28 -translate-x-1/2 bg-gradient-to-r from-transparent via-[#FFBF00]/30 to-transparent blur-xl"
-          aria-hidden="true"
-        />
-
-        {/* (1) intact source content */}
-        <div ref={sourceRef} className="relative z-10">
-          <CtaContent />
-        </div>
-
-        {/* (2)/(3) left + right pieces, clipped along the jagged kerf */}
-        <div
-          ref={pieceLeftRef}
-          className="pointer-events-none absolute inset-0 z-[9]"
-          style={{ transformOrigin: "0 100%", filter: "drop-shadow(0 0 14px rgba(0,0,0,.6))" }}
-          aria-hidden="true"
-        >
-          <div ref={clipLeftRef} className="absolute inset-0 overflow-hidden">
-            <div className="flex h-full items-center px-4 py-20 sm:px-8 sm:py-28">
-              <CtaContent />
-            </div>
+      {/* (2)/(3) left + right pieces */}
+      <div
+        ref={pieceLeftRef}
+        className="pointer-events-none invisible absolute inset-0 z-[2] [.bn-is-armed_&]:visible [.bn-is-armed_&]:opacity-[.01] [.bn-is-split_&]:visible [.bn-is-split_&]:opacity-100"
+        style={{ transformOrigin: "0 100%", filter: "drop-shadow(0 0 16px rgba(0,0,0,.65))" }}
+      >
+        <div ref={clipLeftRef} className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0">
+            <SectionBackground />
+            <HeroCopy interactive={false} />
           </div>
-        </div>
-        <div
-          ref={pieceRightRef}
-          className="pointer-events-none absolute inset-0 z-[9]"
-          style={{ transformOrigin: "100% 100%", filter: "drop-shadow(0 0 14px rgba(0,0,0,.6))" }}
-          aria-hidden="true"
-        >
-          <div ref={clipRightRef} className="absolute inset-0 overflow-hidden">
-            <div className="flex h-full items-center px-4 py-20 sm:px-8 sm:py-28">
-              <CtaContent />
-            </div>
-          </div>
-        </div>
-
-        {/* (8) cut line / kerf */}
-        <div ref={cutLineRef} className="pointer-events-none absolute inset-0 z-[10]" aria-hidden="true">
-          <div ref={cutGapRef} className="absolute inset-0" style={{ backgroundColor: "#0c0f14" }} />
-        </div>
-        </section>
-
-        {/* fx: saw + particles — sibling of the card, NOT clipped by its
-            rounded corners/overflow-hidden, so the whole saw stays visible
-            as it travels in from above and plunges down to the bottom */}
-        <div ref={fxRef} className="bn-fx pointer-events-none absolute left-0 right-0 z-[50] overflow-visible" aria-hidden="true">
-          <div
-            ref={sawRef}
-            className="absolute left-0 top-0 h-[600px] w-[300px] will-change-transform"
-            style={{ transformOrigin: `${SAW.anchorX}px ${SAW.anchorY}px` }}
-          >
-            <div ref={sawShadowRef} className="absolute inset-0 opacity-40 blur-[6px]" style={{ filter: "brightness(0)" }}>
-              <SawSvg id="cta-shadow" />
-            </div>
-            <SawSvg id="cta-main" />
-          </div>
-          <div ref={dustLayerRef} className="absolute inset-0" />
-          <div ref={sparkLayerRef} className="absolute inset-0" />
         </div>
       </div>
+      <div
+        ref={pieceRightRef}
+        className="pointer-events-none invisible absolute inset-0 z-[2] [.bn-is-armed_&]:visible [.bn-is-armed_&]:opacity-[.01] [.bn-is-split_&]:visible [.bn-is-split_&]:opacity-100"
+        style={{ transformOrigin: "100% 100%", filter: "drop-shadow(0 0 16px rgba(0,0,0,.65))" }}
+      >
+        <div ref={clipRightRef} className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0">
+            <SectionBackground />
+            <HeroCopy interactive={false} />
+          </div>
+        </div>
+      </div>
+
+      {/* (8) cut line / kerf */}
+      <div
+        ref={cutLineRef}
+        className="pointer-events-none absolute inset-0 z-[4]"
+        style={{ clipPath: "inset(0 0 100% 0)" }}
+      >
+        <div ref={cutGapRef} className="absolute inset-0" style={{ backgroundColor: "#030405" }} />
+      </div>
+
+      {/* fx layer: saw + particles, taller than the section */}
+      <div ref={fxRef} className="bn-fx pointer-events-none absolute left-0 right-0 z-[5] overflow-hidden">
+        <div
+          ref={sawRef}
+          className="bn-saw invisible absolute left-0 top-0 h-[600px] w-[300px] will-change-transform"
+          style={{ transformOrigin: `${SAW.anchorX}px ${SAW.anchorY}px` }}
+        >
+          <div ref={sawShadowRef} className="absolute inset-0 opacity-40 blur-[7px]" style={{ filter: "brightness(0)" }}>
+            <SawSvg id="shadow" />
+          </div>
+          <SawSvg id="main" />
+        </div>
+
+        <div ref={dustLayerRef} className="absolute inset-0" />
+        <div ref={sparkLayerRef} className="absolute inset-0" />
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Background: photo + palette-matched shading ---------- */
+
+function SectionBackground() {
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <div
+        className="absolute inset-0 bg-cover bg-[center_42%]"
+        style={{
+          backgroundImage: `url(${HERO_PHOTO})`,
+          filter: "grayscale(.25) contrast(1.05) brightness(.68) saturate(.9)",
+        }}
+      />
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `
+            linear-gradient(to bottom, rgba(30,36,50,.65) 0%, rgba(30,36,50,0) 24%),
+            linear-gradient(to right, rgba(30,36,50,.82) 0%, rgba(30,36,50,.46) 42%, rgba(30,36,50,.05) 72%),
+            linear-gradient(to top, rgba(30,36,50,.9) 0%, rgba(30,36,50,0) 26%),
+            radial-gradient(120% 90% at 60% 55%, transparent 55%, rgba(15,18,26,.55))
+          `,
+        }}
+      />
     </div>
   );
 }
