@@ -16,7 +16,7 @@ import {
   Check,
 } from "lucide-react";
 import { jobs } from "../../data/Jobsdata";
-import ApplicationForm from "../../Components/ApplicationForm/ApplicationForm";
+import ApplicationModal from "../../Components/ApplicationModal/ApplicationModal";
 
 export default function JobDetails() {
   const { jobId } = useParams();
@@ -37,10 +37,13 @@ export default function JobDetails() {
 
   if (!job) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-white text-[#14212E]">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-white text-[#3C3C3B]">
         <p className="text-lg font-semibold">Job not found</p>
-        <Link to="/careers" className="text-amber-600 underline underline-offset-4">
-          Back to open positions
+        <Link
+          to="/careers"
+          className="text-[#2A317A] underline underline-offset-4"
+        >
+          Back to available jobs
         </Link>
       </div>
     );
@@ -55,9 +58,9 @@ export default function JobDetails() {
         <div className="mx-auto max-w-6xl px-6 py-4 sm:px-10 lg:px-16">
           <Link
             to="/careers"
-            className="inline-flex items-center gap-1.5 text-[13.5px] text-slate-500 transition-colors hover:text-[#14212E]"
+            className="inline-flex items-center gap-1.5 text-[13.5px] text-slate-500 transition-colors hover:text-[#3C3C3B]"
           >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to open positions
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to available jobs
           </Link>
         </div>
       </div>
@@ -72,21 +75,24 @@ export default function JobDetails() {
         >
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-2xl">
-              <p className="font-mono text-[12px] uppercase tracking-wide text-amber-600">
+              <p className="font-mono text-[12px] uppercase tracking-wide text-[#2A317A]">
                 {job.department}
               </p>
-              <h1 className="mt-2 text-[32px] font-bold leading-tight tracking-tight text-[#14212E] sm:text-[44px]">
+
+              <h1 className="mt-2 text-[32px] font-bold leading-tight tracking-tight text-[#3C3C3B] sm:text-[44px]">
                 {job.title}
               </h1>
+
               <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-[14.5px] text-slate-500">
                 <span className="flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" />
                   {job.locationLabel}
                 </span>
+
                 <span className="flex items-center gap-1.5">
                   <Wallet className="h-4 w-4" />
-                  {job.salaryMin.toLocaleString()} – {job.salaryMax.toLocaleString()}{" "}
-                  {job.currency}
+                  {job.salaryMin.toLocaleString()} –{" "}
+                  {job.salaryMax.toLocaleString()} {job.currency}
                 </span>
               </div>
             </div>
@@ -118,11 +124,11 @@ export default function JobDetails() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="rounded-2xl border border-slate-200 p-6 shadow-[0_1px_2px_rgba(20,33,46,0.04)] lg:sticky lg:top-8"
+              className="rounded-2xl border border-slate-200 p-6 shadow-[0_1px_2px_rgba(60,60,59,0.06)] lg:sticky lg:top-8"
             >
               <button
                 onClick={() => setShowForm(true)}
-                className="relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-[#14212E] py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#1F3888]"
+                className="relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-[#2A317A] py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#232a68]"
               >
                 {isWaiting ? "Join Waiting List" : "Apply Now"}
               </button>
@@ -130,7 +136,7 @@ export default function JobDetails() {
               <div className="mt-3 flex items-center justify-center gap-4">
                 <button
                   onClick={() => setSaved((s) => !s)}
-                  className="flex items-center gap-1.5 text-[13px] font-medium text-slate-500 hover:text-[#14212E]"
+                  className="flex items-center gap-1.5 text-[13px] font-medium text-slate-500 hover:text-[#3C3C3B]"
                 >
                   <motion.span
                     animate={saved ? { scale: [1, 1.3, 1] } : { scale: 1 }}
@@ -138,16 +144,18 @@ export default function JobDetails() {
                   >
                     <Bookmark
                       className="h-4 w-4"
-                      fill={saved ? "#D98A2B" : "none"}
-                      stroke={saved ? "#D98A2B" : "currentColor"}
+                      fill={saved ? "#2A317A" : "none"}
+                      stroke={saved ? "#2A317A" : "currentColor"}
                     />
                   </motion.span>
                   {saved ? "Saved" : "Save"}
                 </button>
+
                 <span className="h-4 w-px bg-slate-200" />
+
                 <button
                   onClick={handleShare}
-                  className="flex items-center gap-1.5 text-[13px] font-medium text-slate-500 hover:text-[#14212E]"
+                  className="flex items-center gap-1.5 text-[13px] font-medium text-slate-500 hover:text-[#3C3C3B]"
                 >
                   <AnimatePresence mode="wait">
                     {copied ? (
@@ -178,37 +186,44 @@ export default function JobDetails() {
               <div className="mt-6 space-y-4 border-t border-slate-200 pt-6">
                 <dl className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <Briefcase className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                    <Briefcase className="mt-0.5 h-4 w-4 shrink-0 text-[#2A317A]" />
                     <div>
                       <dt className="text-[12px] text-slate-400">Department</dt>
-                      <dd className="text-[14px] font-medium text-[#14212E]">
+                      <dd className="text-[14px] font-medium text-[#3C3C3B]">
                         {job.department}
                       </dd>
                     </div>
                   </div>
+
                   <div className="flex items-start gap-3">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#2A317A]" />
                     <div>
                       <dt className="text-[12px] text-slate-400">Location</dt>
-                      <dd className="text-[14px] font-medium text-[#14212E]">
+                      <dd className="text-[14px] font-medium text-[#3C3C3B]">
                         {job.locationLabel}
                       </dd>
                     </div>
                   </div>
+
                   <div className="flex items-start gap-3">
-                    <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                    <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-[#2A317A]" />
                     <div>
                       <dt className="text-[12px] text-slate-400">Job Type</dt>
-                      <dd className="text-[14px] font-medium text-[#14212E]">{job.type}</dd>
+                      <dd className="text-[14px] font-medium text-[#3C3C3B]">
+                        {job.type}
+                      </dd>
                     </div>
                   </div>
+
                   <div className="flex items-start gap-3">
-                    <Wallet className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                    <Wallet className="mt-0.5 h-4 w-4 shrink-0 text-[#2A317A]" />
                     <div>
-                      <dt className="text-[12px] text-slate-400">Salary Range</dt>
-                      <dd className="text-[14px] font-medium text-[#14212E]">
-                        {job.salaryMin.toLocaleString()} – {job.salaryMax.toLocaleString()}{" "}
-                        {job.currency}
+                      <dt className="text-[12px] text-slate-400">
+                        Salary Range
+                      </dt>
+                      <dd className="text-[14px] font-medium text-[#3C3C3B]">
+                        {job.salaryMin.toLocaleString()} –{" "}
+                        {job.salaryMax.toLocaleString()} {job.currency}
                       </dd>
                     </div>
                   </div>
@@ -228,20 +243,28 @@ export default function JobDetails() {
             >
               {isWaiting ? (
                 <>
-                  <strong className="font-semibold">This position is currently closed.</strong>{" "}
-                  We're not actively hiring for this role right now. You can still join the
-                  waiting list — we'll reach out if the position reopens.
+                  <strong className="font-semibold">
+                    This position is currently closed.
+                  </strong>{" "}
+                  There is no active hiring for this position at the moment.
+                  You can join the waiting list, and we will contact you if the
+                  position becomes available again.
                 </>
               ) : (
                 <>
-                  <strong className="font-semibold">This position is currently open.</strong>{" "}
-                  We're actively reviewing applications for this role.
+                  <strong className="font-semibold">
+                    This position is currently available.
+                  </strong>{" "}
+                  We are actively reviewing applications for this position.
                 </>
               )}
             </div>
 
             <section>
-              <h2 className="text-[20px] font-bold text-[#14212E]">About the role</h2>
+              <h2 className="text-[20px] font-bold text-[#3C3C3B]">
+                About the Role
+              </h2>
+
               <p className="mt-3 text-[15.5px] leading-relaxed text-slate-600">
                 {job.overview}
               </p>
@@ -249,11 +272,17 @@ export default function JobDetails() {
 
             {job.responsibilities?.length > 0 && (
               <section>
-                <h2 className="text-[20px] font-bold text-[#14212E]">Key Responsibilities</h2>
+                <h2 className="text-[20px] font-bold text-[#3C3C3B]">
+                  Key Responsibilities
+                </h2>
+
                 <ul className="mt-4 space-y-3">
                   {job.responsibilities.map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-[15px] text-slate-600">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                    <li
+                      key={i}
+                      className="flex items-start gap-3 text-[15px] text-slate-600"
+                    >
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#2A317A]" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -263,11 +292,17 @@ export default function JobDetails() {
 
             {job.requirements?.length > 0 && (
               <section>
-                <h2 className="text-[20px] font-bold text-[#14212E]">Requirements</h2>
+                <h2 className="text-[20px] font-bold text-[#3C3C3B]">
+                  Requirements
+                </h2>
+
                 <ul className="mt-4 space-y-3">
                   {job.requirements.map((item, i) => (
-                    <li key={i} className="flex items-start gap-3 text-[15px] text-slate-600">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#1F3888]" />
+                    <li
+                      key={i}
+                      className="flex items-start gap-3 text-[15px] text-slate-600"
+                    >
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#2A317A]" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -275,29 +310,22 @@ export default function JobDetails() {
               </section>
             )}
 
-            {!showForm ? (
-              <button
-                onClick={() => setShowForm(true)}
-                className="relative flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-xl bg-[#14212E] py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#1F3888] sm:w-auto sm:px-10"
-              >
-                {isWaiting ? "Join Waiting List" : "Apply"}
-              </button>
-            ) : (
-              <AnimatePresence>
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="overflow-hidden border-t border-slate-200 pt-8"
-                >
-                  <ApplicationForm job={job} isWaiting={isWaiting} />
-                </motion.div>
-              </AnimatePresence>
-            )}
+            <button
+              onClick={() => setShowForm(true)}
+              className="relative flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-xl bg-[#2A317A] py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#232a68] sm:w-auto sm:px-10"
+            >
+              {isWaiting ? "Join Waiting List" : "Apply"}
+            </button>
           </div>
         </div>
       </div>
+
+      <ApplicationModal
+        job={job}
+        isWaiting={isWaiting}
+        isOpen={showForm}
+        onClose={() => setShowForm(false)}
+      />
     </div>
   );
 }
