@@ -29,11 +29,18 @@ function lerpColor(base, active, t) {
 }
 
 // ألوان الموقع (يلو + توهج خفيف) بدل الأزرق الافتراضي
+// const THEME = {
+//   lineActive: { r: 255, g: 191, b: 0, a: 0.5 },
+//   nodeActive: { r: 255, g: 191, b: 0, a: 1 },
+//   glow: "255,191,0",
+//   ripple: "255,191,0",
+// };
+
 const THEME = {
-  lineActive: { r: 255, g: 191, b: 0, a: 0.5 },
-  nodeActive: { r: 255, g: 191, b: 0, a: 1 },
-  glow: "255,191,0",
-  ripple: "255,191,0",
+  lineActive: { r: 42, g: 49, b: 122, a: 0.5 },
+  nodeActive: { r: 42, g: 49, b: 122, a: 1 },
+  glow: "42,49,122",
+  ripple: "42,49,122",
 };
 
 export default function KineticGrid({ children, className = "" }) {

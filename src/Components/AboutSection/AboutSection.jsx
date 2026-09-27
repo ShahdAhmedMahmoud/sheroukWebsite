@@ -10,7 +10,6 @@
 //   ArrowRight,
 // } from "lucide-react";
 // import Counter from "../Counter/Counter";
-// import TowerCraneArt from "./TowerCraneArt";
 // import AnimatedTowerCrane from "../AnimatedTowerCrane/AnimatedTowerCrane.jsx";
 
 // const containerVariants = {
@@ -77,33 +76,17 @@
 
 // export default function AboutSection() {
 //   return (
-//     <section className="w-full py-24 px-4 overflow-hidden relative" id="about">
+//     <section
+//       className="w-full py-24 px-4 overflow-hidden relative min-h-[900px] md:min-h-screen"
+//       id="about"
+//     >
 //       {/* عناصر ديكور خلفية */}
 //       <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-[#D3D6E2]/5 blur-3xl pointer-events-none" />
 //       <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-[#D3D6E2]/10 blur-3xl pointer-events-none" />
-//         {/* الأوناش المرسومة بخطوط */}
 
-// <AnimatedTowerCrane className="absolute inset-y-0 left-0 w-32 md:w-48 hidden lg:block" />
-// <AnimatedTowerCrane className="absolute inset-y-0 right-0 w-32 md:w-48 hidden lg:block scale-x-[-1]" />
-//   {/* <TowerCraneArt
-//     className="absolute inset-y-0 left-0 h-full w-auto opacity-[0.35] pointer-events-none hidden md:block"
-//     color="#000000"
-//   />
-//   <TowerCraneArt
-//     className="absolute inset-y-0 right-0 h-full w-auto opacity-[0.35] pointer-events-none hidden md:block"
-//     color="#000000"
-//     flip
-//   /> */}
-
-//     {/* <TowerCraneArt
-//     className="absolute inset-y-0 left-2 lg:left-8 w-24 lg:w-32 hidden lg:block pointer-events-none"
-//   />
-//   <TowerCraneArt
-//     className="absolute inset-y-0 right-2 lg:right-8 w-24 lg:w-32 hidden lg:block pointer-events-none"
-//     flip
-//   /> */}
-
-
+//       {/* الأوناش المرسومة بخطوط - بطول السكشن كله */}
+//       <AnimatedTowerCrane className="absolute top-0 left-0 h-full w-40 sm:w-56 md:w-72 lg:w-96 opacity-70 z-0 hidden sm:block" />
+//       <AnimatedTowerCrane className="absolute top-0 right-0 h-full w-40 sm:w-56 md:w-72 lg:w-96 opacity-70 z-0 hidden sm:block scale-x-[-1]" />
 
 //       <motion.div
 //         className="container mx-auto max-w-6xl relative z-10"
@@ -262,6 +245,7 @@
 // }
 
 
+
 import { motion } from "motion/react";
 import {
   Building2,
@@ -272,56 +256,81 @@ import {
   ShieldCheck,
   ArrowRight,
 } from "lucide-react";
+
 import Counter from "../Counter/Counter";
 import AnimatedTowerCrane from "../AnimatedTowerCrane/AnimatedTowerCrane.jsx";
 
+// =========================================================
+// ANIMATION VARIANTS
+// =========================================================
+
 const containerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.15, delayChildren: 0.2 } },
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
 };
+
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  hidden: {
+    opacity: 0,
+    y: 20,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut",
+    },
+  },
 };
+
+// =========================================================
+// FEATURES
+// =========================================================
 
 const features = [
   {
-    icon: <Building2 className="w-6 h-6" />,
+    icon: <Building2 className="h-6 w-6" />,
     title: "Quality Craftsmanship",
     description:
       "We use premium materials and precise techniques to ensure every structure stands the test of time.",
     position: "left",
   },
   {
-    icon: <Award className="w-6 h-6" />,
+    icon: <Award className="h-6 w-6" />,
     title: "Certified Engineers",
     description:
       "Our projects are led by certified engineers who bring technical expertise and strict quality control to every phase.",
     position: "left",
   },
   {
-    icon: <Users className="w-6 h-6" />,
+    icon: <Users className="h-6 w-6" />,
     title: "Expert Team",
     description:
       "A skilled workforce of over 5000 professionals dedicated to bringing your vision to life.",
     position: "left",
   },
   {
-    icon: <Calendar className="w-6 h-6" />,
+    icon: <Calendar className="h-6 w-6" />,
     title: "On-Time Delivery",
     description:
       "We plan meticulously to deliver every project on schedule, without compromising quality.",
     position: "right",
   },
   {
-    icon: <Wrench className="w-6 h-6" />,
+    icon: <Wrench className="h-6 w-6" />,
     title: "Modern Equipment",
     description:
       "Equipped with the latest heavy machinery to handle projects of any scale efficiently.",
     position: "right",
   },
   {
-    icon: <ShieldCheck className="w-6 h-6" />,
+    icon: <ShieldCheck className="h-6 w-6" />,
     title: "Safety First",
     description:
       "Strict safety standards protect our team and ensure smooth, secure project execution.",
@@ -329,154 +338,326 @@ const features = [
   },
 ];
 
+// =========================================================
+// STATS
+// =========================================================
+
 const stats = [
-  { target: 5000, suffix: "+", label: "MANPOWER" },
-  { target: 500, suffix: "+", label: "HEAVY EQUIPMENT" },
-  { target: 1, suffix: "M", label: "CONCRETE" },
-  { target: 63, suffix: "+", label: "ACTIVE PROJECTS" },
-  { target: 42, suffix: "", label: "DELIVERED PROJECTS" },
+  {
+    target: 5000,
+    suffix: "+",
+    label: "MANPOWER",
+  },
+  {
+    target: 500,
+    suffix: "+",
+    label: "HEAVY EQUIPMENT",
+  },
+  {
+    target: 1,
+    suffix: "M",
+    label: "CONCRETE",
+  },
+  {
+    target: 63,
+    suffix: "+",
+    label: "ACTIVE PROJECTS",
+  },
+  {
+    target: 42,
+    suffix: "",
+    label: "DELIVERED PROJECTS",
+  },
 ];
+
+// =========================================================
+// ABOUT SECTION
+// =========================================================
 
 export default function AboutSection() {
   return (
     <section
-      className="w-full py-24 px-4 overflow-hidden relative min-h-[900px] md:min-h-screen"
+      className="relative min-h-[900px] w-full overflow-hidden bg-white px-4 py-24 md:min-h-screen"
       id="about"
     >
-      {/* عناصر ديكور خلفية */}
-      <div className="absolute top-20 left-10 w-64 h-64 rounded-full bg-[#D3D6E2]/5 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-[#D3D6E2]/10 blur-3xl pointer-events-none" />
+      {/* =====================================================
+          BACKGROUND DECORATION
+      ===================================================== */}
 
-      {/* الأوناش المرسومة بخطوط - بطول السكشن كله */}
-      <AnimatedTowerCrane className="absolute top-0 left-0 h-full w-40 sm:w-56 md:w-72 lg:w-96 opacity-70 z-0 hidden sm:block" />
-      <AnimatedTowerCrane className="absolute top-0 right-0 h-full w-40 sm:w-56 md:w-72 lg:w-96 opacity-70 z-0 hidden sm:block scale-x-[-1]" />
+      <div className="pointer-events-none absolute left-10 top-20 h-64 w-64 rounded-full bg-[#3C3C3B]/5 blur-3xl" />
+
+      <div className="pointer-events-none absolute bottom-20 right-10 h-80 w-80 rounded-full bg-[#3C3C3B]/10 blur-3xl" />
+
+      {/* =====================================================
+          TOWER CRANES
+      ===================================================== */}
+
+      <AnimatedTowerCrane
+        className="absolute left-0 top-0 z-0 hidden h-full w-40 opacity-70 sm:block sm:w-56 md:w-72 lg:w-96"
+      />
+
+      <AnimatedTowerCrane
+        className="absolute right-0 top-0 z-0 hidden h-full w-40 scale-x-[-1] opacity-70 sm:block sm:w-56 md:w-72 lg:w-96"
+      />
+
+      {/* =====================================================
+          MAIN CONTENT
+      ===================================================== */}
 
       <motion.div
-        className="container mx-auto max-w-6xl relative z-10"
+        className="container relative z-10 mx-auto max-w-6xl"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
+        viewport={{
+          once: true,
+          amount: 0.2,
+        }}
         variants={containerVariants}
       >
-        {/* العنوان */}
-        <motion.div className="flex flex-col items-center mb-6" variants={itemVariants}>
-          <span className="text-[#D98A2B] font-semibold mb-2 tracking-wide text-sm">
+        {/* ===================================================
+            HEADER
+        =================================================== */}
+
+        <motion.div
+          className="mb-6 flex flex-col items-center"
+          variants={itemVariants}
+        >
+          <span className="mb-2 text-sm font-semibold tracking-wide text-[#2A317A]">
             DISCOVER OUR STORY
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-[#1E2432] text-center">
+
+          <h2 className="text-center text-4xl font-bold text-black md:text-5xl">
             About Us
           </h2>
+
           <motion.div
-            className="w-24 h-1 bg-[#2A317A] mt-4"
-            initial={{ width: 0 }}
-            whileInView={{ width: 96 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            className="mt-4 h-1 bg-[#2A317A]"
+            initial={{
+              width: 0,
+            }}
+            whileInView={{
+              width: 96,
+            }}
+            viewport={{
+              once: true,
+            }}
+            transition={{
+              duration: 0.8,
+              delay: 0.3,
+            }}
           />
         </motion.div>
 
+        {/* ===================================================
+            DESCRIPTION
+        =================================================== */}
+
         <motion.p
           variants={itemVariants}
-          className="text-center max-w-2xl mx-auto mb-4 text-[#6C757D]"
+          className="mx-auto mb-4 max-w-2xl text-center text-[#3C3C3B]"
         >
-          We are a leading construction company committed to excellence and
-          innovation, delivering high-quality projects that shape Egypt's
-          skyline.
+          We are a leading construction company committed
+          to excellence and innovation, delivering
+          high-quality projects that shape Egypt's skyline.
         </motion.p>
 
-        <motion.div variants={itemVariants} className="text-center mb-16">
+        {/* ===================================================
+            LEARN MORE
+        =================================================== */}
+
+        <motion.div
+          variants={itemVariants}
+          className="mb-16 text-center"
+        >
           <a
             href="/about"
-            className="text-[#2A317A] font-semibold hover:underline"
+            className="font-semibold text-[#2A317A] transition-opacity hover:opacity-70"
           >
             Learn more about us →
           </a>
         </motion.div>
 
-        {/* الجدول: مميزات - صورة - مميزات */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative items-center">
-          <div className="space-y-12 order-2 md:order-1">
+        {/* ===================================================
+            FEATURES + IMAGE
+        =================================================== */}
+
+        <div className="relative grid grid-cols-1 items-center gap-10 md:grid-cols-3">
+          {/* =================================================
+              LEFT FEATURES
+          ================================================= */}
+
+          <div className="order-2 space-y-12 md:order-1">
             {features
-              .filter((f) => f.position === "left")
-              .map((f, i) => (
-                <FeatureItem key={i} {...f} delay={i * 0.15} direction="left" />
+              .filter(
+                (feature) =>
+                  feature.position === "left"
+              )
+              .map((feature, index) => (
+                <FeatureItem
+                  key={index}
+                  {...feature}
+                  delay={index * 0.15}
+                  direction="left"
+                />
               ))}
           </div>
 
-          <div className="order-1 md:order-2 flex justify-center mb-8 md:mb-0">
-            <motion.div className="relative w-full max-w-xs" variants={itemVariants}>
+          {/* =================================================
+              CENTER IMAGE
+          ================================================= */}
+
+          <div className="order-1 mb-8 flex justify-center md:order-2 md:mb-0">
+            <motion.div
+              className="relative w-full max-w-xs"
+              variants={itemVariants}
+            >
+              {/* Image */}
               <motion.div
-                className="rounded-2xl overflow-hidden shadow-xl"
-                whileHover={{ scale: 1.03 }}
-                transition={{ duration: 0.3 }}
+                className="overflow-hidden rounded-2xl shadow-xl"
+                whileHover={{
+                  scale: 1.03,
+                }}
+                transition={{
+                  duration: 0.3,
+                }}
               >
                 <img
                   src="/src/assets/images/DSC_3583.JPG"
                   alt="Shorouq project"
-                  className="w-full h-80 object-cover"
+                  className="h-80 w-full object-cover"
                 />
               </motion.div>
-              <div className="absolute inset-0 border-4 border-[#D98A2B] rounded-2xl -m-3 -z-10" />
+
+              {/* Blue frame */}
+              <div className="absolute inset-0 -z-10 -m-3 rounded-2xl border-4 border-[#2A317A]" />
+
+              {/* Decorative circle */}
               <motion.div
-                className="absolute -top-4 -right-6 w-16 h-16 rounded-full bg-[#2A317A]/10"
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -right-6 -top-4 h-16 w-16 rounded-full bg-[#2A317A]/10"
+                animate={{
+                  y: [0, -10, 0],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               />
+
+              {/* Decorative circle */}
               <motion.div
-                className="absolute -bottom-6 -left-8 w-20 h-20 rounded-full bg-[#D98A2B]/20"
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                className="absolute -bottom-6 -left-8 h-20 w-20 rounded-full bg-[#3C3C3B]/10"
+                animate={{
+                  y: [0, 10, 0],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.5,
+                }}
               />
             </motion.div>
           </div>
 
-          <div className="space-y-12 order-3">
+          {/* =================================================
+              RIGHT FEATURES
+          ================================================= */}
+
+          <div className="order-3 space-y-12">
             {features
-              .filter((f) => f.position === "right")
-              .map((f, i) => (
-                <FeatureItem key={i} {...f} delay={i * 0.15} direction="right" />
+              .filter(
+                (feature) =>
+                  feature.position === "right"
+              )
+              .map((feature, index) => (
+                <FeatureItem
+                  key={index}
+                  {...feature}
+                  delay={index * 0.15}
+                  direction="right"
+                />
               ))}
           </div>
         </div>
 
-        {/* الأرقام */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 mt-24">
-          {stats.map((s, i) => (
+        {/* ===================================================
+            STATS
+        =================================================== */}
+
+        <div className="mt-24 grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-6">
+          {stats.map((stat, index) => (
             <motion.div
-              key={i}
-              className="bg-white rounded-xl shadow-md py-6 px-3 text-center"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
+              key={index}
+              className="rounded-xl border border-[#3C3C3B]/15 bg-white px-3 py-6 text-center shadow-md shadow-black/5"
+              initial={{
+                opacity: 0,
+                y: 30,
+              }}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+              }}
+              viewport={{
+                once: true,
+                amount: 0.4,
+              }}
+              transition={{
+                duration: 0.5,
+                delay: index * 0.1,
+              }}
             >
-              <Counter target={s.target} suffix={s.suffix} />
-              <p className="text-sm md:text-base text-[#6C757D] mt-2">
-                {s.label}
+              <Counter
+                target={stat.target}
+                suffix={stat.suffix}
+              />
+
+              <p className="mt-2 text-sm text-[#3C3C3B] md:text-base">
+                {stat.label}
               </p>
             </motion.div>
           ))}
         </div>
 
-        {/* CTA */}
+        {/* ===================================================
+            CTA
+        =================================================== */}
+
         <motion.div
-          className="mt-20 bg-[#2A317A] text-white p-8 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8 }}
+          className="mt-20 flex flex-col items-center justify-between gap-6 rounded-2xl bg-[#2A317A] p-8 text-center text-white md:flex-row md:text-left"
+          initial={{
+            opacity: 0,
+            y: 30,
+          }}
+          whileInView={{
+            opacity: 1,
+            y: 0,
+          }}
+          viewport={{
+            once: true,
+            amount: 0.3,
+          }}
+          transition={{
+            duration: 0.8,
+          }}
         >
           <div>
-            <h3 className="text-2xl font-bold mb-2">
+            <h3 className="mb-2 text-2xl font-bold">
               Ready to build your next project?
             </h3>
-            <p className="text-white/80">Let's create something great together.</p>
+
+            <p className="text-white/80">
+              Let's create something great together.
+            </p>
           </div>
+
           <a
             href="/contact"
-            className="bg-[#D98A2B] text-[#1E2432] px-6 py-3 rounded-full font-semibold flex items-center gap-2 hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-[#2A317A] transition-opacity hover:opacity-90"
           >
-            Get In Touch <ArrowRight className="w-4 h-4" />
+            Get In Touch
+
+            <ArrowRight className="h-4 w-4" />
           </a>
         </motion.div>
       </motion.div>
@@ -484,23 +665,56 @@ export default function AboutSection() {
   );
 }
 
-function FeatureItem({ icon, title, description, delay, direction }) {
+// =========================================================
+// FEATURE ITEM
+// =========================================================
+
+function FeatureItem({
+  icon,
+  title,
+  description,
+  delay,
+  direction,
+}) {
   return (
     <motion.div
-      className="flex flex-col group"
-      initial={{ opacity: 0, x: direction === "left" ? -30 : 30 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, amount: 0.4 }}
-      transition={{ duration: 0.6, delay }}
-      whileHover={{ y: -5 }}
+      className="group flex flex-col"
+      initial={{
+        opacity: 0,
+        x:
+          direction === "left"
+            ? -30
+            : 30,
+      }}
+      whileInView={{
+        opacity: 1,
+        x: 0,
+      }}
+      viewport={{
+        once: true,
+        amount: 0.4,
+      }}
+      transition={{
+        duration: 0.6,
+        delay,
+      }}
+      whileHover={{
+        y: -5,
+      }}
     >
-      <div className="flex items-center gap-3 mb-2">
-        <div className="text-[#1F3888] bg-[#1F3888]/10 p-3 rounded-lg group-hover:bg-[#D98A2B]/20 group-hover:text-[#1E2432] transition-colors duration-300">
+      {/* Feature heading */}
+      <div className="mb-2 flex items-center gap-3">
+        <div className="rounded-lg bg-[#2A317A]/10 p-3 text-[#2A317A] transition-colors duration-300 group-hover:bg-[#2A317A] group-hover:text-white">
           {icon}
         </div>
-        <h4 className="text-lg font-bold text-[#1E2432]">{title}</h4>
+
+        <h4 className="text-lg font-bold text-black">
+          {title}
+        </h4>
       </div>
-      <p className="text-sm text-[#6C757D] leading-relaxed pl-[52px]">
+
+      {/* Description */}
+      <p className="pl-[52px] text-sm leading-relaxed text-[#3C3C3B]">
         {description}
       </p>
     </motion.div>

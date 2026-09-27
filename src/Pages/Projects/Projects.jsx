@@ -18,7 +18,7 @@ export default function Projects() {
       <FlowSection aria-label="Sectors" className="bg-[#F8F9FD]" >
         <SectorFilterSection />
       </FlowSection>
-      <FlowSection aria-label="CTA" className="bg-[#1E2432]" >
+      <FlowSection aria-label="CTA" className="bg-[#FFFFFF]" >
         <ProjectsCTASection />
       </FlowSection>
 

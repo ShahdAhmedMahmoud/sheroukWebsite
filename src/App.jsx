@@ -11,7 +11,7 @@ import ScrollToTop from "./Components/ScrollToTop/ScrollToTop.jsx";
 import LanguageProvider from "./Context/LanguageContext/LanguageContext.jsx";
 import Careers from "./Pages/Careers/Careers.jsx";
 import JobDetails from "./Pages/JobDetails/JobDetails.jsx";
-
+import Contact from "./Pages/Contact/Contact.jsx"
 export default function App() {
   return (
     <BrowserRouter>
@@ -22,6 +22,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/careers" element={<Careers />} /> 
+        <Route path="/contact" element={<Contact />} /> 
         <Route path="/careers/:jobId" element={<JobDetails />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/projects/:id" element={<ProjectDetails />} /> 

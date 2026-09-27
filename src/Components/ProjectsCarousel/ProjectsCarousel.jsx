@@ -1,7 +1,4 @@
 
-
-
-
 // import { useRef, useState, useCallback, useEffect, useLayoutEffect } from "react";
 // import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -19,8 +16,9 @@
 //   fade = 0.1,
 //   cardWidth = "clamp(220px, 30vw, 380px)",
 //   gap = 0,
-//   //back card
-//   backSpread = 0.15,
+//   backSpread = -0.2, // مسافة إضافية بتتحكم في تباعد الكروت البعيدة (اللي ورا) بس، من غير ما تأثر على الكارت النص
+//   backStart = 1, // من عندها يبدأ تأثير backSpread (distance <= backStart مش بتتأثر خالص)
+//   backRamp = 2, // بعد كام "خطوة" (كارت) بعد backStart يوصل التأثير لأقصاه
 //   loop = true,
 //   showNavigation = true,
 //   autoplay = true,
@@ -68,15 +66,26 @@
 //       const ramp = Math.pow(distance, falloff);
 //       const tilt = Math.min(rotate * ramp, 82) * Math.sign(offset);
 
+//       // مسافة إضافية مستقلة تمامًا عن الشفافية: بتبدأ صفر لحد distance = backStart
+//       // (يعني الكارت النص واللي جنبه مباشرة مش بيتأثروا)، وبتوصل لأقصاها
+//       // (backSpread كامل) بعد ما تعدي backRamp خطوة زيادة. النطاق ده ثابت
+//       // ومش مربوط بنقطة اختفاء الكارت، فالتأثير بيبان فعليًا على الكروت
+//       // اللي لسه ظاهرة بس بعيدة عن النص.
+//       const backProgress = Math.min(
+//         1,
+//         Math.max(0, (distance - backStart) / Math.max(0.0001, backRamp))
+//       );
+//       const extraSpread = backSpread * width * backProgress * Math.sign(offset);
+
 //       card.style.transform =
-//         `translateX(calc(-50% + ${offset * pitch}px)) ` +
+//         `translateX(calc(-50% + ${offset * pitch + extraSpread}px)) ` +
 //         `translateZ(${-depth * width * ramp}px) rotateY(${-tilt}deg)`;
 
 //       const edge = loop ? Math.min(1, Math.max(0, count / 2 - distance)) : 1;
 //       card.style.opacity = String(Math.max(0, 1 - fade * distance) * edge);
 //       card.style.zIndex = String(100 - Math.round(distance));
 //     });
-//   }, [count, depth, fade, falloff, gap, loop, rotate]);
+//   }, [backRamp, backSpread, backStart, count, depth, fade, falloff, gap, loop, rotate]);
 
 //   // بيحرك الموضع تدريجيًا (تباطؤ) لحد ما يوصل للهدف
 //   const settle = useCallback(
@@ -316,29 +325,41 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import { useRef, useState, useCallback, useEffect, useLayoutEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
+import {
+  useRef,
+  useState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+} from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 function cx(...classes) {
   return classes.filter(Boolean).join(" ");
 }
+
+// =========================================================
+// STATUS HELPERS
+// =========================================================
+
+function getStatusLabel(status) {
+  return String(status).toLowerCase() === "finished"
+    ? "Delivered"
+    : "Ongoing";
+}
+
+function getStatusClass(status) {
+  return getStatusLabel(status) === "Delivered"
+    ? "bg-[#22C55E] text-black"
+    : "bg-[#FACC15] text-black";
+}
+
+// =========================================================
+// PROJECTS CAROUSEL
+// =========================================================
 
 export function ProjectsCarousel({
   slides,
@@ -349,13 +370,13 @@ export function ProjectsCarousel({
   fade = 0.1,
   cardWidth = "clamp(220px, 30vw, 380px)",
   gap = 0,
-  backSpread = -0.2, // مسافة إضافية بتتحكم في تباعد الكروت البعيدة (اللي ورا) بس، من غير ما تأثر على الكارت النص
-  backStart = 1, // من عندها يبدأ تأثير backSpread (distance <= backStart مش بتتأثر خالص)
-  backRamp = 2, // بعد كام "خطوة" (كارت) بعد backStart يوصل التأثير لأقصاه
+  backSpread = -0.2,
+  backStart = 1,
+  backRamp = 2,
   loop = true,
   showNavigation = true,
   autoplay = true,
-  autoplayInterval = 2000, 
+  autoplayInterval = 2000,
   label = "معرض المشاريع",
   className,
 }) {
@@ -368,20 +389,30 @@ export function ProjectsCarousel({
   const widthRef = useRef(0);
   const rafRef = useRef(null);
   const dragRef = useRef(null);
-  const autoplayRef = useRef(null); // ref جديد بيحمل الـ timer بتاع الـ autoplay
+  const autoplayRef = useRef(null);
 
   const [selected, setSelected] = useState(0);
 
-  // بيرجع أقرب رقم كارت صحيح، ملفوف داخل نطاق 0 إلى count-1
+  // =========================================================
+  // INDEX
+  // =========================================================
+
   const indexAt = useCallback(
-    (pos) => ((Math.round(pos) % count) + count) % count,
+    (pos) =>
+      ((Math.round(pos) % count) + count) %
+      count,
     [count]
   );
 
-  // بيرسم موضع كل كارت مباشرة على الـ DOM (من غير re-render) في كل فريم
+  // =========================================================
+  // PAINT
+  // =========================================================
+
   const paint = useCallback(() => {
     const width = widthRef.current;
+
     if (!width) return;
+
     const pitch = width * (1 + gap);
     const pos = posRef.current;
 
@@ -389,101 +420,218 @@ export function ProjectsCarousel({
       if (!card) return;
 
       let offset = index - pos;
+
       if (loop) {
-        offset = ((offset % count) + count) % count;
-        if (offset > count / 2) offset -= count;
+        offset =
+          ((offset % count) + count) %
+          count;
+
+        if (offset > count / 2) {
+          offset -= count;
+        }
       }
 
       const distance = Math.abs(offset);
 
-      const ramp = Math.pow(distance, falloff);
-      const tilt = Math.min(rotate * ramp, 82) * Math.sign(offset);
+      const ramp = Math.pow(
+        distance,
+        falloff
+      );
 
-      // مسافة إضافية مستقلة تمامًا عن الشفافية: بتبدأ صفر لحد distance = backStart
-      // (يعني الكارت النص واللي جنبه مباشرة مش بيتأثروا)، وبتوصل لأقصاها
-      // (backSpread كامل) بعد ما تعدي backRamp خطوة زيادة. النطاق ده ثابت
-      // ومش مربوط بنقطة اختفاء الكارت، فالتأثير بيبان فعليًا على الكروت
-      // اللي لسه ظاهرة بس بعيدة عن النص.
+      const tilt =
+        Math.min(rotate * ramp, 82) *
+        Math.sign(offset);
+
       const backProgress = Math.min(
         1,
-        Math.max(0, (distance - backStart) / Math.max(0.0001, backRamp))
+        Math.max(
+          0,
+          (distance - backStart) /
+            Math.max(0.0001, backRamp)
+        )
       );
-      const extraSpread = backSpread * width * backProgress * Math.sign(offset);
+
+      const extraSpread =
+        backSpread *
+        width *
+        backProgress *
+        Math.sign(offset);
 
       card.style.transform =
-        `translateX(calc(-50% + ${offset * pitch + extraSpread}px)) ` +
-        `translateZ(${-depth * width * ramp}px) rotateY(${-tilt}deg)`;
+        `translateX(calc(-50% + ${
+          offset * pitch + extraSpread
+        }px)) ` +
+        `translateZ(${
+          -depth * width * ramp
+        }px) rotateY(${-tilt}deg)`;
 
-      const edge = loop ? Math.min(1, Math.max(0, count / 2 - distance)) : 1;
-      card.style.opacity = String(Math.max(0, 1 - fade * distance) * edge);
-      card.style.zIndex = String(100 - Math.round(distance));
+      const edge = loop
+        ? Math.min(
+            1,
+            Math.max(
+              0,
+              count / 2 - distance
+            )
+          )
+        : 1;
+
+      card.style.opacity = String(
+        Math.max(
+          0,
+          1 - fade * distance
+        ) * edge
+      );
+
+      card.style.zIndex = String(
+        100 - Math.round(distance)
+      );
     });
-  }, [backRamp, backSpread, backStart, count, depth, fade, falloff, gap, loop, rotate]);
+  }, [
+    backRamp,
+    backSpread,
+    backStart,
+    count,
+    depth,
+    fade,
+    falloff,
+    gap,
+    loop,
+    rotate,
+  ]);
 
-  // بيحرك الموضع تدريجيًا (تباطؤ) لحد ما يوصل للهدف
+  // =========================================================
+  // SETTLE
+  // =========================================================
+
   const settle = useCallback(
     (target) => {
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(
+          rafRef.current
+        );
+      }
+
       targetRef.current = target;
       setSelected(indexAt(target));
 
       const step = () => {
-        const remaining = target - posRef.current;
+        const remaining =
+          target - posRef.current;
+
         if (Math.abs(remaining) < 0.0004) {
           posRef.current = target;
           paint();
           rafRef.current = null;
           return;
         }
-        posRef.current += remaining * 0.16;
+
+        posRef.current +=
+          remaining * 0.16;
+
         paint();
-        rafRef.current = requestAnimationFrame(step);
+
+        rafRef.current =
+          requestAnimationFrame(step);
       };
-      rafRef.current = requestAnimationFrame(step);
+
+      rafRef.current =
+        requestAnimationFrame(step);
     },
     [indexAt, paint]
   );
 
+  // =========================================================
+  // CLAMP
+  // =========================================================
+
   const clamp = useCallback(
-    (pos) => (loop ? pos : Math.max(0, Math.min(count - 1, pos))),
+    (pos) =>
+      loop
+        ? pos
+        : Math.max(
+            0,
+            Math.min(count - 1, pos)
+          ),
     [count, loop]
   );
 
+  // =========================================================
+  // NUDGE
+  // =========================================================
+
   const nudge = useCallback(
-    (by) => settle(clamp(Math.round(targetRef.current) + by)),
+    (by) =>
+      settle(
+        clamp(
+          Math.round(
+            targetRef.current
+          ) + by
+        )
+      ),
     [clamp, settle]
   );
 
-  // ==== Autoplay: بيوقف نفسه ويشتغل تاني ====
+  // =========================================================
+  // AUTOPLAY
+  // =========================================================
+
   const stopAutoplay = useCallback(() => {
     if (autoplayRef.current !== null) {
-      clearInterval(autoplayRef.current);
+      clearInterval(
+        autoplayRef.current
+      );
+
       autoplayRef.current = null;
     }
   }, []);
 
   const startAutoplay = useCallback(() => {
     if (!autoplay) return;
-    stopAutoplay(); // نتأكد الأول إن مفيش نسخة تانية شغالة
-    autoplayRef.current = setInterval(() => {
-      nudge(1);
-    }, autoplayInterval);
-  }, [autoplay, autoplayInterval, nudge, stopAutoplay]);
 
-  // بيشغل الـ autoplay أول ما الكومبوننت يظهر، وبيوقفه لما يتشال
+    stopAutoplay();
+
+    autoplayRef.current =
+      setInterval(() => {
+        nudge(1);
+      }, autoplayInterval);
+  }, [
+    autoplay,
+    autoplayInterval,
+    nudge,
+    stopAutoplay,
+  ]);
+
   useEffect(() => {
     startAutoplay();
+
     return () => stopAutoplay();
-  }, [startAutoplay, stopAutoplay]);
+  }, [
+    startAutoplay,
+    stopAutoplay,
+  ]);
+
+  // =========================================================
+  // POINTER DOWN
+  // =========================================================
 
   const onPointerDown = (event) => {
-    stopAutoplay(); // المستخدم بدأ يسحب بإيده - نوقف الحركة التلقائية
+    stopAutoplay();
+
     if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
+      cancelAnimationFrame(
+        rafRef.current
+      );
+
       rafRef.current = null;
     }
-    event.currentTarget.setPointerCapture(event.pointerId);
-    targetRef.current = posRef.current;
+
+    event.currentTarget.setPointerCapture(
+      event.pointerId
+    );
+
+    targetRef.current =
+      posRef.current;
+
     dragRef.current = {
       id: event.pointerId,
       x: event.clientX,
@@ -493,79 +641,182 @@ export function ProjectsCarousel({
     };
   };
 
+  // =========================================================
+  // POINTER MOVE
+  // =========================================================
+
   const onPointerMove = (event) => {
     const drag = dragRef.current;
-    if (!drag || drag.id !== event.pointerId) return;
 
-    const pitch = widthRef.current * (1 + gap);
+    if (
+      !drag ||
+      drag.id !== event.pointerId
+    ) {
+      return;
+    }
+
+    const pitch =
+      widthRef.current *
+      (1 + gap);
+
     if (!pitch) return;
 
     const now = performance.now();
-    const previous = posRef.current;
-    posRef.current = clamp(drag.pos - (event.clientX - drag.x) / pitch);
-    drag.v = ((posRef.current - previous) / Math.max(now - drag.t, 1)) * 1000;
+
+    const previous =
+      posRef.current;
+
+    posRef.current = clamp(
+      drag.pos -
+        (event.clientX - drag.x) /
+          pitch
+    );
+
+    drag.v =
+      ((posRef.current -
+        previous) /
+        Math.max(
+          now - drag.t,
+          1
+        )) *
+      1000;
+
     drag.t = now;
 
-    const index = indexAt(posRef.current);
-    if (index !== selected) setSelected(index);
+    const index = indexAt(
+      posRef.current
+    );
+
+    if (index !== selected) {
+      setSelected(index);
+    }
+
     paint();
   };
 
+  // =========================================================
+  // END DRAG
+  // =========================================================
+
   const endDrag = (event) => {
     const drag = dragRef.current;
-    if (!drag || drag.id !== event.pointerId) return;
+
+    if (
+      !drag ||
+      drag.id !== event.pointerId
+    ) {
+      return;
+    }
+
     dragRef.current = null;
-    const carried = Math.max(-2, Math.min(2, drag.v * 0.18));
-    settle(clamp(Math.round(posRef.current + carried)));
-    startAutoplay(); // المستخدم خلّص سحب - نرجّع الحركة التلقائية تاني
+
+    const carried = Math.max(
+      -2,
+      Math.min(2, drag.v * 0.18)
+    );
+
+    settle(
+      clamp(
+        Math.round(
+          posRef.current + carried
+        )
+      )
+    );
+
+    startAutoplay();
   };
 
-  // بيقيس عرض الكارت الفعلي على الشاشة، ويعيد القياس لو حجم النافذة اتغيّر
+  // =========================================================
+  // MEASURE CARD
+  // =========================================================
+
   useLayoutEffect(() => {
     const frame = frameRef.current;
+
     if (!frame) return;
 
     const measure = () => {
-      const card = cardRefs.current[0];
+      const card =
+        cardRefs.current[0];
+
       if (!card) return;
-      widthRef.current = card.offsetWidth;
+
+      widthRef.current =
+        card.offsetWidth;
+
       paint();
     };
 
     measure();
-    const observer = new ResizeObserver(measure);
+
+    const observer =
+      new ResizeObserver(measure);
+
     observer.observe(frame);
-    return () => observer.disconnect();
+
+    return () =>
+      observer.disconnect();
   }, [paint]);
+
+  // =========================================================
+  // CLEANUP
+  // =========================================================
 
   useEffect(
     () => () => {
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(
+          rafRef.current
+        );
+      }
     },
     []
   );
 
+  // =========================================================
+  // RENDER
+  // =========================================================
+
   return (
     <div
-      className={cx("w-full", className)}
-      style={{ "--cf-card": cardWidth }}
+      className={cx(
+        "w-full",
+        className
+      )}
+      style={{
+        "--cf-card": cardWidth,
+      }}
       role="region"
       aria-roledescription="carousel"
       aria-label={label}
     >
       <div className="relative">
+        {/* =================================================
+            CAROUSEL FRAME
+        ================================================= */}
+
         <div
           ref={frameRef}
           tabIndex={0}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
+          onPointerDown={
+            onPointerDown
+          }
+          onPointerMove={
+            onPointerMove
+          }
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
           onKeyDown={(event) => {
-            if (event.key === "ArrowLeft") {
+            if (
+              event.key ===
+              "ArrowLeft"
+            ) {
               event.preventDefault();
               nudge(-1);
-            } else if (event.key === "ArrowRight") {
+            } else if (
+              event.key ===
+              "ArrowRight"
+            ) {
               event.preventDefault();
               nudge(1);
             }
@@ -578,74 +829,117 @@ export function ProjectsCarousel({
         >
           <div
             className="relative select-none"
-            style={{ height: "var(--cf-card)", transformStyle: "preserve-3d" }}
+            style={{
+              height:
+                "var(--cf-card)",
+              transformStyle:
+                "preserve-3d",
+            }}
           >
-            {slides.map((slide, index) => (
-              <div
-                key={index}
-                ref={(node) => {
-                  cardRefs.current[index] = node;
-                }}
-                role="group"
-                aria-roledescription="slide"
-                aria-label={`${index + 1} من ${count}`}
-                className="group absolute left-1/2 top-0 aspect-[4/5] overflow-hidden rounded-2xl bg-[#F8F9FD] shadow-xl will-change-transform"
-                style={{ width: "var(--cf-card)" }}
-              >
-                {/* صورة المشروع كاملة كخلفية الكارت */}
-                <img
-                  src={slide.src}
-                  alt={slide.alt}
-                  draggable={false}
-                  className="h-full w-full select-none object-cover"
-                />
+            {slides.map(
+              (slide, index) => (
+                <div
+                  key={index}
+                  ref={(node) => {
+                    cardRefs.current[
+                      index
+                    ] = node;
+                  }}
+                  role="group"
+                  aria-roledescription="slide"
+                  aria-label={`${index + 1} من ${count}`}
+                  className="group absolute left-1/2 top-0 aspect-[4/5] overflow-hidden rounded-2xl bg-white shadow-xl will-change-transform"
+                  style={{
+                    width:
+                      "var(--cf-card)",
+                  }}
+                >
+                  {/* =================================================
+                      PROJECT IMAGE
+                  ================================================= */}
 
-                {/* ==== طبقة الـ Hover: اسم المشروع كبير في النص + الحالة تحته ====
-                    bg-[#1E2432]/80 لون غامق موحّد (مش gradient) عشان يبقى غامق بالتساوي فوق الصورة كلها */}
-                <div className="absolute inset-0 bg-[#1E2432]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col items-center justify-center text-center p-5">
-                  <h3 className="text-white font-bold text-2xl mb-3 scale-90 group-hover:scale-100 transition-transform duration-400">
-                    {slide.title}
-                  </h3>
-                  <span
-                    className={cx(
-                      "px-3 py-1 rounded-full text-xs font-semibold mb-4",
-                      slide.status === "Finished"
-                        ? "bg-[#D98A2B] text-[#1E2432]"
-                        : "bg-white/20 text-white"
-                    )}
-                  >
-                    {slide.status === "Finished" ? "Finished" : "Ongoing"}
-                  </span>
-                  <a
-                    href={slide.href || "#"}
-                    className="inline-flex items-center gap-1 text-[#D98A2B] font-semibold text-sm"
-                  >
-                    Learn More
-                    <ChevronRight className="w-4 h-4" />
-                  </a>
+                  <img
+                    src={slide.src}
+                    alt={slide.alt}
+                    draggable={false}
+                    className="h-full w-full select-none object-cover"
+                  />
+
+                  {/* =================================================
+                      HOVER OVERLAY
+                  ================================================= */}
+
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 p-5 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    {/* Project title */}
+                    <h3 className="mb-3 scale-90 text-2xl font-bold text-white transition-transform duration-300 group-hover:scale-100">
+                      {slide.title}
+                    </h3>
+
+                    {/* =================================================
+                        STATUS
+                    ================================================= */}
+
+                    <span
+                      className={cx(
+                        "mb-4 rounded-full px-3 py-1 text-xs font-semibold",
+                        getStatusClass(
+                          slide.status
+                        )
+                      )}
+                    >
+                      {getStatusLabel(
+                        slide.status
+                      )}
+                    </span>
+
+                    {/* =================================================
+                        LEARN MORE
+                    ================================================= */}
+
+                    <a
+                      href={
+                        slide.href ||
+                        "#"
+                      }
+                      className="inline-flex items-center gap-1 text-sm font-semibold text-[#FFFFFF] transition-opacity hover:opacity-80"
+                    >
+                      Learn More
+
+                      <ChevronRight className="h-4 w-4" />
+                    </a>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         </div>
+
+        {/* =================================================
+            NAVIGATION
+        ================================================= */}
 
         {showNavigation && (
           <>
             <button
               type="button"
               aria-label="المشروع السابق"
-              onClick={() => nudge(-1)}
-              className="absolute left-3 top-1/2 z-[200] -translate-y-1/2 rounded-full bg-white/80 p-2 text-[#1E2432] backdrop-blur transition hover:bg-white"
+              onClick={() =>
+                nudge(-1)
+              }
+              className="absolute left-3 top-1/2 z-[200] -translate-y-1/2 rounded-full bg-white/90 p-2 text-black shadow-md backdrop-blur transition-colors hover:bg-[#2A317A] hover:text-white"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="h-5 w-5" />
             </button>
+
             <button
               type="button"
               aria-label="المشروع التالي"
-              onClick={() => nudge(1)}
-              className="absolute right-3 top-1/2 z-[200] -translate-y-1/2 rounded-full bg-white/80 p-2 text-[#1E2432] backdrop-blur transition hover:bg-white"
+              onClick={() =>
+                nudge(1)
+              }
+              className="absolute right-3 top-1/2 z-[200] -translate-y-1/2 rounded-full bg-white/90 p-2 text-black shadow-md backdrop-blur transition-colors hover:bg-[#2A317A] hover:text-white"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="h-5 w-5" />
             </button>
           </>
         )}

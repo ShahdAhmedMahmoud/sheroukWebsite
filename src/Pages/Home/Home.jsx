@@ -32,7 +32,7 @@ export default function Home() {
       </FlowSection>
 
       {/* SERVICES */}
-      <FlowSection aria-label="Services" className="bg-[#1E2432]">
+      <FlowSection aria-label="Services" className="bg-[#3C3C3B]">
         <ServicesSection />
       </FlowSection>
 

@@ -95,32 +95,6 @@ export default function ServicesSection() {
       className="relative w-full py-24 px-4 overflow-hidden bg-[#F8F9FD]"
       id="services"
     >
-  {/* Construction Video Background */}
-      {/* <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden" aria-hidden="true">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          className="absolute inset-0 w-full h-full object-cover scale-105"
-          style={{
-            filter: "grayscale(1) sepia(0.3) hue-rotate(175deg) saturate(2)",
-            mixBlendMode: "multiply",
-            opacity: 0.22,
-            maskImage:
-              "radial-gradient(ellipse 80% 70% at 50% 50%, black 40%, transparent 100%)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse 80% 70% at 50% 50%, black 40%, transparent 100%)",
-          }}
-        >
-          <source src="/videos/construction.mp4" type="video/mp4" />
-        </video>
-      </div> */}
-
-
-
-
       <div className="relative z-10 container m-auto px-4 md:px-8 lg:px-16">
         <div className="text-center mb-14">
           <h2 className="text-4xl font-bold text-[#1E2432]">
@@ -139,9 +113,9 @@ export default function ServicesSection() {
                 key={service.title}
                 className="flex items-center gap-4 cursor-pointer"
               >
-                <span className="text-sm font-mono text-[#6C757D]">
+                {/* <span className="text-sm font-mono text-[#6C757D]">
                   {String(index + 1).padStart(2, "0")}
-                </span>
+                </span> */}
                 <service.Icon className="w-5 h-5 text-[#1F3888] shrink-0" />
                 <TextStaggerHover
                   index={index}

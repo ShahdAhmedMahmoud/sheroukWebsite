@@ -331,12 +331,25 @@ export default function ProjectChallenges({
                         {item.title[1]}
                       </h3> */}
 
-                      <h3
+                      {/* <h3
   className={cn(
     "leading-[0.95] tracking-tight transition-all duration-700",
     active
       ? "text-2xl min-[400px]:text-4xl md:text-5xl xl:text-6xl text-[#373A49] opacity-100 md:translate-x-4"
       : "text-lg min-[400px]:text-2xl md:text-3xl xl:text-4xl text-transparent opacity-50 [-webkit-text-stroke:1.5px_#373A49] md:translate-x-0"
+  )}
+>
+  {item.title[0]}
+  <br />
+  {item.title[1]}
+</h3> */}
+
+<h3
+  className={cn(
+    "leading-[0.95] tracking-tight transition-all duration-700",
+    active
+      ? "text-2xl min-[400px]:text-4xl md:text-5xl xl:text-6xl text-[#373A49] opacity-100 md:translate-x-4"
+      : "text-lg min-[400px]:text-2xl md:text-3xl xl:text-4xl text-[#373A49] opacity-50 md:translate-x-0"
   )}
 >
   {item.title[0]}
