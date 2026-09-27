@@ -63,20 +63,20 @@ export default function FlowScroll({ children, className, "aria-label": ariaLabe
         if (!inner) return;
 
         // كل section (ما عدا الأول) بيدخل ملفوف بزاوية وبيترد لصفر وهو داخل الشاشة
-        if (i > 0) {
-          gsap.set(inner, { rotation: 26, transformOrigin: "bottom left" });
-          const tween = gsap.to(inner, {
-            rotation: 0,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: "top bottom",
-              end: "top 20%",
-              scrub: 0.6, // رقم بسيط بيدّي smoothing إضافي بدل true الجامدة
-            },
-          });
-          if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
-        }
+        // if (i > 0) {
+        //   gsap.set(inner, { rotation: 26, transformOrigin: "bottom left" });
+        //   const tween = gsap.to(inner, {
+        //     rotation: 0,
+        //     ease: "none",
+        //     scrollTrigger: {
+        //       trigger: section,
+        //       start: "top bottom",
+        //       end: "top 20%",
+        //       scrub: 0.6, // رقم بسيط بيدّي smoothing إضافي بدل true الجامدة
+        //     },
+        //   });
+        //   if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
+        // }
 
         // كل section (ما عدا الأخير) بيتثبت لحد ما اللي بعده يغطيه بالكامل
         if (i < sections.length - 1) {

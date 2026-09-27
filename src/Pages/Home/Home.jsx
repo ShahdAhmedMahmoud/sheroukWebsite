@@ -20,15 +20,15 @@ export default function Home() {
 
       {/* ABOUT */}
       <FlowSection aria-label="About" className="bg-[#F8F9FD]">
-        <BricksAccentBackground
+        {/* <BricksAccentBackground
           backgroundColor="#F8F9FD"
           showMortar={false}
           opacity={1}
           rows={5}
           edgeWidth={250}
-        >
+        > */}
           <AboutSection />
-        </BricksAccentBackground>
+        {/* </BricksAccentBackground> */}
       </FlowSection>
 
       {/* SERVICES */}
@@ -42,10 +42,10 @@ export default function Home() {
       </FlowSection>
 
       {/* TIMELINE */}
-      <FlowSection aria-label="Timeline" className="bg-[#1E2432]">
+      {/* <FlowSection aria-label="Timeline" className="bg-[#1E2432]">
         <TimelineHeader />
         <TimelineSection />
-      </FlowSection>
+      </FlowSection> */}
 
       {/* TESTIMONIALS */}
       <FlowSection aria-label="Testimonials" className="bg-[#1E2432]">
