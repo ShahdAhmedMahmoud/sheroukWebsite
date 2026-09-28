@@ -11,7 +11,7 @@ import SawCutHeroSection from '../../Components/SawCutHeroSection/SawCutHeroSect
 export default function Projects() {
   return<>
     <FlowScroll aria-label="Our Projects" className="">
-      <FlowSection aria-label="Hero" className="bg-[#1E2432]" >
+      <FlowSection aria-label="Hero" className="bg-[#FFFFFF]" >
         <ProjectsHero />
       </FlowSection>
 

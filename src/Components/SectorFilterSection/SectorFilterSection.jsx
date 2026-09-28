@@ -1625,14 +1625,14 @@ function ProjectCard({ project }) {
           />
 
           {/* Grid overlay */}
-          <div
+          {/* <div
             className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             style={{
               backgroundImage:
                 "linear-gradient(rgba(42,49,122,0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(42,49,122,0.22) 1px, transparent 1px)",
               backgroundSize: "18px 18px",
             }}
-          />
+          /> */}
 
           {/* Status */}
           <span

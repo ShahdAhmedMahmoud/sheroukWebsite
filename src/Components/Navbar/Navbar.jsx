@@ -129,48 +129,27 @@
 //               group
 //               relative
 //               shrink-0
-//               h-8
-//               sm:h-9
+
+//               /* مساحة آمنة للوجو */
+//               h-11
+//               sm:h-12
+//               md:h-14
+
 //               px-2
 //               sm:px-3
+//               md:px-4
+
 //               flex
 //               items-center
 //               justify-center
-//               focus:outline-none
-//             "
-//             whileTap={{ scale: 0.92 }}
-//           >
-//             {/* Rotating dashed circle */}
-//             <motion.svg
-//               viewBox="0 0 100 100"
-//               className="
-//                 absolute
-//                 inset-0
-//                 w-full
-//                 h-full
-//                 pointer-events-none
-//               "
-//               animate={{ rotate: 360 }}
-//               transition={{
-//                 duration: 14,
-//                 repeat: Infinity,
-//                 ease: "linear",
-//               }}
-//             >
-//               <circle
-//                 cx="50"
-//                 cy="50"
-//                 r="46"
-//                 fill="none"
-//                 stroke="#1F3888"
-//                 strokeWidth="1"
-//                 strokeDasharray="4 8"
-//                 strokeLinecap="round"
-//                 opacity={0.35}
-//               />
-//             </motion.svg>
 
-//             {/* Yellow open state */}
+//               focus:outline-none
+
+//               overflow-hidden
+//             "
+//             whileTap={{ scale: 0.96 }}
+//           >
+//             {/* ================= YELLOW OPEN STATE ================= */}
 //             <motion.span
 //               className="
 //                 absolute
@@ -191,7 +170,7 @@
 //               }}
 //             />
 
-//             {/* Hover pulse */}
+//             {/* ================= HOVER PULSE ================= */}
 //             <motion.span
 //               className="
 //                 absolute
@@ -212,7 +191,7 @@
 //               }}
 //             />
 
-//             {/* Logo */}
+//             {/* ================= LOGO ================= */}
 //             <motion.div
 //               animate={{
 //                 rotate: menuOpen ? 90 : 0,
@@ -223,10 +202,19 @@
 //                 stiffness: 200,
 //                 damping: 15,
 //               }}
-//               className="relative z-10"
+//               className="
+//                 relative
+//                 z-10
+//                 flex
+//                 items-center
+//                 justify-center
+//                 max-w-full
+//                 max-h-full
+//               "
 //             >
 //               <AnimatePresence mode="wait" initial={false}>
 //                 {scrolled ? (
+//                   /* ================= SMALL ICON AFTER SCROLL ================= */
 //                   <motion.img
 //                     key="icon"
 //                     src="/src/assets/images/logo-icon.webp"
@@ -247,14 +235,17 @@
 //                       duration: 0.25,
 //                     }}
 //                     className="
-//                       h-5
-//                       sm:h-6
-//                       md:h-7
+//                       h-6
+//                       sm:h-7
+//                       md:h-8
 //                       w-auto
+//                       max-w-full
+//                       max-h-full
 //                       object-contain
 //                     "
 //                   />
 //                 ) : (
+//                   /* ================= FULL COMPANY LOGO ================= */
 //                   <motion.img
 //                     key="full"
 //                     src="/src/assets/images/AL Shorouk/Al-Shorouk Logo.png"
@@ -275,13 +266,18 @@
 //                       duration: 0.25,
 //                     }}
 //                     className="
-//                       h-6
-//                       sm:h-7
-//                       md:h-8
-//                       max-w-[110px]
-//                       sm:max-w-[140px]
-//                       md:max-w-none
+//                       h-9
+//                       sm:h-10
+//                       md:h-11
+
 //                       w-auto
+
+//                       max-w-[150px]
+//                       sm:max-w-[180px]
+//                       md:max-w-[210px]
+
+//                       max-h-full
+
 //                       object-contain
 //                     "
 //                   />
@@ -289,7 +285,7 @@
 //               </AnimatePresence>
 //             </motion.div>
 
-//             {/* Menu tooltip - Desktop only */}
+//             {/* ================= MENU TOOLTIP ================= */}
 //             <motion.span
 //               initial={{
 //                 opacity: 0,
@@ -341,7 +337,9 @@
 //                     duration: 0.2,
 //                   },
 //                 }}
-//                 transition={{ duration: 0.3 }}
+//                 transition={{
+//                   duration: 0.3,
+//                 }}
 //                 className="
 //                   hidden
 //                   lg:flex
@@ -396,8 +394,16 @@
 //             )}
 //           </AnimatePresence>
 
-//           {/* ================= LANGUAGE SWITCHER (ثابت مع الـ navbar دايمًا) ================= */}
-//           <div className="shrink-0 pl-1 sm:pl-2 border-l border-[#1F3888]/10">
+//           {/* ================= LANGUAGE SWITCHER ================= */}
+//           <div
+//             className="
+//               shrink-0
+//               pl-1
+//               sm:pl-2
+//               border-l
+//               border-[#1F3888]/10
+//             "
+//           >
 //             <LanguageSwitcher />
 //           </div>
 //         </motion.nav>
@@ -432,7 +438,7 @@
 //               px-6
 //             "
 //           >
-//             {/* Background lines */}
+//             {/* ================= BACKGROUND LINES ================= */}
 //             <svg
 //               className="
 //                 absolute
@@ -487,79 +493,106 @@
 //               />
 //             </svg>
 
-//             {/* Corner brackets */}
-//             <span className="
-//               absolute
-//               top-5
-//               left-5
-//               sm:top-8
-//               sm:left-8
-//               w-6
-//               h-6
-//               sm:w-8
-//               sm:h-8
-//               border-t-2
-//               border-l-2
-//               border-[#D98A2B]
-//             " />
+//             {/* ================= CORNER BRACKETS ================= */}
+//             <span
+//               className="
+//                 absolute
+//                 top-5
+//                 left-5
+//                 sm:top-8
+//                 sm:left-8
+//                 w-6
+//                 h-6
+//                 sm:w-8
+//                 sm:h-8
+//                 border-t-2
+//                 border-l-2
+//                 border-[#D98A2B]
+//               "
+//             />
 
-//             <span className="
-//               absolute
-//               top-5
-//               right-5
-//               sm:top-8
-//               sm:right-8
-//               w-6
-//               h-6
-//               sm:w-8
-//               sm:h-8
-//               border-t-2
-//               border-r-2
-//               border-[#D98A2B]
-//             " />
+//             <span
+//               className="
+//                 absolute
+//                 top-5
+//                 right-5
+//                 sm:top-8
+//                 sm:right-8
+//                 w-6
+//                 h-6
+//                 sm:w-8
+//                 sm:h-8
+//                 border-t-2
+//                 border-r-2
+//                 border-[#D98A2B]
+//               "
+//             />
 
-//             <span className="
-//               absolute
-//               bottom-5
-//               left-5
-//               sm:bottom-8
-//               sm:left-8
-//               w-6
-//               h-6
-//               sm:w-8
-//               sm:h-8
-//               border-b-2
-//               border-l-2
-//               border-[#D98A2B]
-//             " />
+//             <span
+//               className="
+//                 absolute
+//                 bottom-5
+//                 left-5
+//                 sm:bottom-8
+//                 sm:left-8
+//                 w-6
+//                 h-6
+//                 sm:w-8
+//                 sm:h-8
+//                 border-b-2
+//                 border-l-2
+//                 border-[#D98A2B]
+//               "
+//             />
 
-//             <span className="
-//               absolute
-//               bottom-5
-//               right-5
-//               sm:bottom-8
-//               sm:right-8
-//               w-6
-//               h-6
-//               sm:w-8
-//               sm:h-8
-//               border-b-2
-//               border-r-2
-//               border-[#D98A2B]
-//             " />
+//             <span
+//               className="
+//                 absolute
+//                 bottom-5
+//                 right-5
+//                 sm:bottom-8
+//                 sm:right-8
+//                 w-6
+//                 h-6
+//                 sm:w-8
+//                 sm:h-8
+//                 border-b-2
+//                 border-r-2
+//                 border-[#D98A2B]
+//               "
+//             />
 
-//             {/* Language switcher - visible while the full menu is open too */}
+//             {/* ================= LANGUAGE SWITCHER ================= */}
 //             <motion.div
-//               initial={{ opacity: 0, y: -12 }}
-//               animate={{ opacity: 1, y: 0 }}
-//               exit={{ opacity: 0, y: -12 }}
-//               transition={{ duration: 0.4, delay: 0.1 }}
-//               className="absolute top-5 sm:top-8 left-1/2 -translate-x-1/2 z-10"
+//               initial={{
+//                 opacity: 0,
+//                 y: -12,
+//               }}
+//               animate={{
+//                 opacity: 1,
+//                 y: 0,
+//               }}
+//               exit={{
+//                 opacity: 0,
+//                 y: -12,
+//               }}
+//               transition={{
+//                 duration: 0.4,
+//                 delay: 0.1,
+//               }}
+//               className="
+//                 absolute
+//                 top-5
+//                 sm:top-8
+//                 left-1/2
+//                 -translate-x-1/2
+//                 z-10
+//               "
 //             >
 //               <LanguageSwitcher />
 //             </motion.div>
 
-//             {/* Menu links */}
+//             {/* ================= MENU LINKS ================= */}
 //             <ul
 //               className="
 //                 relative
@@ -574,8 +607,16 @@
 //               <AnimatePresence mode="wait">
 //                 <motion.div
 //                   key={language}
-//                   initial={{ opacity: 1 }}
-//                   className="flex flex-col items-center gap-3 sm:gap-4"
+//                   initial={{
+//                     opacity: 1,
+//                   }}
+//                   className="
+//                     flex
+//                     flex-col
+//                     items-center
+//                     gap-3
+//                     sm:gap-4
+//                   "
 //                 >
 //                   {navItems.map((item, i) => (
 //                     <motion.li
@@ -624,7 +665,7 @@
 //               </AnimatePresence>
 //             </ul>
 
-//             {/* Footer text */}
+//             {/* ================= FOOTER TEXT ================= */}
 //             <motion.p
 //               initial={{
 //                 opacity: 0,
@@ -655,7 +696,6 @@
 //     </>
 //   );
 // }
-
 
 
 
@@ -765,12 +805,12 @@ export default function Navbar() {
             items-center
             justify-center
             mx-auto
-            bg-white
+            bg-[#FFFFFF]
             rounded-full
             shadow-lg
-            shadow-[#1E2432]/10
+            shadow-[#000000]/10
             border
-            border-[#1F3888]/10
+            border-[#2A317A]/10
             w-fit
             max-w-full
 
@@ -784,13 +824,14 @@ export default function Navbar() {
           {/* ================= LOGO / MENU BUTTON ================= */}
           <motion.button
             onClick={() => setMenuOpen((p) => !p)}
-            aria-label={menuOpen ? t("menuCloseLabel") : t("menuOpenLabel")}
+            aria-label={
+              menuOpen ? t("menuCloseLabel") : t("menuOpenLabel")
+            }
             className="
               group
               relative
               shrink-0
 
-              /* مساحة آمنة للوجو */
               h-11
               sm:h-12
               md:h-14
@@ -809,14 +850,14 @@ export default function Navbar() {
             "
             whileTap={{ scale: 0.96 }}
           >
-            {/* ================= YELLOW OPEN STATE ================= */}
+            {/* ================= BLUE OPEN STATE ================= */}
             <motion.span
               className="
                 absolute
                 inset-0
                 rounded-full
                 border-2
-                border-[#D98A2B]
+                border-[#2A317A]
               "
               initial={false}
               animate={{
@@ -836,7 +877,7 @@ export default function Navbar() {
                 absolute
                 inset-0
                 rounded-full
-                bg-[#D98A2B]/10
+                bg-[#2A317A]/10
               "
               initial={{
                 scale: 0.6,
@@ -972,7 +1013,7 @@ export default function Navbar() {
                 text-[16px]
                 tracking-[0.2em]
                 uppercase
-                text-[#6C757D]
+                text-[#3C3C3B]
                 whitespace-nowrap
               "
             >
@@ -1020,8 +1061,8 @@ export default function Navbar() {
                         lg:text-[16px]
                         font-medium
                         tracking-wide
-                        text-[#404041]
-                        group-hover:text-[#1F3888]
+                        text-[#3C3C3B]
+                        group-hover:text-[#2A317A]
                         transition-colors
                         duration-300
                         uppercase
@@ -1040,7 +1081,7 @@ export default function Navbar() {
                         -bottom-1.5
                         h-[1.5px]
                         w-0
-                        bg-[#D98A2B]
+                        bg-[#2A317A]
                         -translate-x-1/2
                         transition-all
                         duration-300
@@ -1061,7 +1102,7 @@ export default function Navbar() {
               pl-1
               sm:pl-2
               border-l
-              border-[#1F3888]/10
+              border-[#2A317A]/10
             "
           >
             <LanguageSwitcher />
@@ -1089,7 +1130,7 @@ export default function Navbar() {
               fixed
               inset-0
               z-40
-              bg-white
+              bg-[#FFFFFF]
               flex
               flex-col
               items-center
@@ -1116,7 +1157,7 @@ export default function Navbar() {
                 y1="18"
                 x2="100"
                 y2="18"
-                stroke="#1F3888"
+                stroke="#2A317A"
                 strokeWidth="0.1"
                 strokeDasharray="1 2"
                 initial={{
@@ -1136,7 +1177,7 @@ export default function Navbar() {
                 y1="82"
                 x2="100"
                 y2="82"
-                stroke="#1F3888"
+                stroke="#2A317A"
                 strokeWidth="0.1"
                 strokeDasharray="1 2"
                 initial={{
@@ -1167,7 +1208,7 @@ export default function Navbar() {
                 sm:h-8
                 border-t-2
                 border-l-2
-                border-[#D98A2B]
+                border-[#2A317A]
               "
             />
 
@@ -1184,7 +1225,7 @@ export default function Navbar() {
                 sm:h-8
                 border-t-2
                 border-r-2
-                border-[#D98A2B]
+                border-[#2A317A]
               "
             />
 
@@ -1201,7 +1242,7 @@ export default function Navbar() {
                 sm:h-8
                 border-b-2
                 border-l-2
-                border-[#D98A2B]
+                border-[#2A317A]
               "
             />
 
@@ -1218,7 +1259,7 @@ export default function Navbar() {
                 sm:h-8
                 border-b-2
                 border-r-2
-                border-[#D98A2B]
+                border-[#2A317A]
               "
             />
 
@@ -1310,8 +1351,8 @@ export default function Navbar() {
                           font-bold
                           uppercase
                           tracking-tight
-                          text-[#404041]
-                          hover:text-[#1F3888]
+                          text-[#3C3C3B]
+                          hover:text-[#2A317A]
                           transition-colors
                           duration-300
                           text-center
@@ -1344,7 +1385,7 @@ export default function Navbar() {
                 sm:mt-10
                 text-xs
                 sm:text-sm
-                text-[#6C757D]
+                text-[#3C3C3B]
                 text-center
               "
             >
@@ -1356,5 +1397,4 @@ export default function Navbar() {
     </>
   );
 }
-
 

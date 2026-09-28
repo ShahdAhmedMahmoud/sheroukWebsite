@@ -12,6 +12,8 @@ import LanguageProvider from "./Context/LanguageContext/LanguageContext.jsx";
 import Careers from "./Pages/Careers/Careers.jsx";
 import JobDetails from "./Pages/JobDetails/JobDetails.jsx";
 import Contact from "./Pages/Contact/Contact.jsx"
+import News from "./Pages/News/News.jsx";
+import NewsDetails from "./Pages/News/NewsDetails.jsx";
 export default function App() {
   return (
     <BrowserRouter>
@@ -26,6 +28,8 @@ export default function App() {
         <Route path="/careers/:jobId" element={<JobDetails />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/projects/:id" element={<ProjectDetails />} /> 
+        <Route path="/news" element={<News />} />
+        <Route path="/news/:id" element={<NewsDetails />} />
         
       </Routes>
       <Footer />

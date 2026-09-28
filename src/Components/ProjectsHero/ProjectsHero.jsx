@@ -125,6 +125,7 @@
 import { motion } from "motion/react";
 import CircularGallery from "../CircularGallery/CircularGallery";
 import KineticGrid from "../KineticGrid/KineticGrid";
+import hospitalImage from "../../../public/projects/s.jpg";
 
 const projects = [
   {
@@ -175,12 +176,12 @@ const projects = [
     alt: "R3 RESIDENTIAL COMPOUND",
     src: "src/assets/images/r3/1.png",
   },
-  {
-    title: "Shebin El-Qanater Hospital",
-    status: "Delivered",
-    alt: "Shebin El-Qanater Hospital",
-    src: "src/assets/images/hospital/1.png",
-  },
+{
+  title: "Shebin El-Qanater Hospital",
+  status: "Delivered",
+  alt: "Shebin El-Qanater Hospital",
+  src: hospitalImage,
+},
   {
     title: "AGA KHAN GARDEN",
     status: "Delivered",
@@ -194,7 +195,7 @@ const projects = [
     src: "src/assets/images/admin/1.png",
   },
   {
-    title: "THE CULTURAL CENTER IN THE MOSQUE OF EGYPT",
+    title: "",
     status: "Ongoing",
     alt: "THE CULTURAL CENTER IN THE MOSQUE OF EGYPT",
     src: "src/assets/images/mosque/1.png",
@@ -205,20 +206,21 @@ export default function ProjectsHero() {
   return (
     <section
       className="relative w-full bg-[#3C3C3B] h-screen"
-      style={{ height: "100svh" }}
+      style={{ height: "80svh" }}
     >
       <div
         className="w-full h-screen sticky top-0 overflow-hidden"
-        style={{ height: "100svh" }}
+        style={{ height: "80svh" }}
       >
         <KineticGrid className="flex flex-col items-center justify-center">
+            <div className="relative w-full h-full translate-y-12 sm:translate-y-16 md:translate-y-20">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="absolute top-14 sm:top-20 md:top-24 left-1/2 -translate-x-1/2 z-20 w-full max-w-[92%] sm:max-w-xl px-4 text-center pointer-events-none"
           >
-            <span className="text-[#2A317A] font-semibold tracking-[0.15em] sm:tracking-[0.2em] text-[10px] sm:text-xs md:text-sm uppercase">
+            <span className="text-[#ffffff] font-semibold tracking-[0.15em] sm:tracking-[0.2em] text-[10px] sm:text-xs md:text-sm uppercase">
               Landmark Developments
             </span>
 
@@ -243,6 +245,7 @@ export default function ProjectsHero() {
               radius={550}
               autoRotateSpeed={0.02}
             />
+          </div>
           </div>
         </KineticGrid>
       </div>

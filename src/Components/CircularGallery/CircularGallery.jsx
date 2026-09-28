@@ -1,227 +1,528 @@
 
 
 
-// import { forwardRef, useState, useEffect, useRef } from "react";
+// // import { forwardRef, useState, useEffect, useRef } from "react";
 
-// function cn(...classes) {
-//   return classes.filter(Boolean).join(" ");
-// }
-
-
-// function getLayout(width) {
-//   if (width < 480) return { cardW: 132, cardH: 178, perspective: 800 };
-//   if (width < 640) return { cardW: 150, cardH: 200, perspective: 950 };
-//   if (width < 1024) return { cardW: 200, cardH: 265, perspective: 1300 };
-//   return { cardW: 260, cardH: 340, perspective: 1800 };
-// }
-
-// const CircularGallery = forwardRef(
-//   (
-//     { items, className, radius: baseRadius = 550, autoRotateSpeed = 0.02, ...props },
-//     ref
-//   ) => {
-//     const [layout, setLayout] = useState(() =>
-//       getLayout(typeof window === "undefined" ? 1280 : window.innerWidth)
-//     );
-
-//     const ringRef = useRef(null);
-//     const itemRefs = useRef([]);
-//     const rotationRef = useRef(0);
-//     const targetRef = useRef(0);
-//     const dragOffsetRef = useRef(0);
-//     const isScrollingRef = useRef(false);
-//     const scrollTimeoutRef = useRef(null);
-//     const rafRef = useRef(0);
-//     const dragRef = useRef({ active: false, startX: 0, startOffset: 0, moved: false });
-
-//     // نصف القطر بيتحسب من عدد الكاردز ومقاسها، مش رقم ثابت
-//     const count = Math.max(items.length, 1);
-//     const derivedRadius = (layout.cardW * count) / (2 * Math.PI) * 1.08;
-//     const radius =
-//       layout.cardW >= 260 ? Math.max(derivedRadius, baseRadius * 0.9) : derivedRadius;
-
-//     // تحديث المقاسات مع أي تغيير في عرض الشاشة (أو دوران الموبايل)
-//     useEffect(() => {
-//       const onResize = () => setLayout(getLayout(window.innerWidth));
-//       onResize();
-//       window.addEventListener("resize", onResize);
-//       window.addEventListener("orientationchange", onResize);
-//       return () => {
-//         window.removeEventListener("resize", onResize);
-//         window.removeEventListener("orientationchange", onResize);
-//       };
-//     }, []);
-
-//     // السكرول بيحرّك الدايرة
-//     useEffect(() => {
-//       const handleScroll = () => {
-//         isScrollingRef.current = true;
-//         if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-
-//         const scrollableHeight =
-//           document.documentElement.scrollHeight - window.innerHeight;
-//         const scrollProgress =
-//           scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0;
-//         targetRef.current = scrollProgress * 720 + dragOffsetRef.current;
-
-//         scrollTimeoutRef.current = setTimeout(() => {
-//           isScrollingRef.current = false;
-//         }, 150);
-//       };
-
-//       window.addEventListener("scroll", handleScroll, { passive: true });
-//       return () => {
-//         window.removeEventListener("scroll", handleScroll);
-//         if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-//       };
-//     }, []);
-
-//     /**
-//      * لوب الأنيميشن. الدوران متسجّل في ref والـ DOM بيتحدّث مباشرة،
-//      * من غير setState كل فريم — ده الفرق الكبير في الأداء على الموبايل.
-//      */
-//     useEffect(() => {
-//       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-//       const tick = () => {
-//         if (!isScrollingRef.current && !dragRef.current.active && !reduceMotion) {
-//           targetRef.current += autoRotateSpeed;
-//         }
-
-//         rotationRef.current += (targetRef.current - rotationRef.current) * 0.12;
-//         const rotation = rotationRef.current;
-
-//         if (ringRef.current) {
-//           ringRef.current.style.transform = `translateZ(${-radius * 0.15}px) rotateY(${rotation}deg)`;
-//         }
-
-//         const anglePerItem = 360 / count;
-//         for (let i = 0; i < count; i++) {
-//           const el = itemRefs.current[i];
-//           if (!el) continue;
-//           const relativeAngle = (i * anglePerItem + (rotation % 360) + 360) % 360;
-//           const normalized = relativeAngle > 180 ? 360 - relativeAngle : relativeAngle;
-//           el.style.opacity = String(Math.max(0.25, 1 - normalized / 180));
-//         }
-
-//         rafRef.current = requestAnimationFrame(tick);
-//       };
-
-//       rafRef.current = requestAnimationFrame(tick);
-//       return () => cancelAnimationFrame(rafRef.current);
-//     }, [autoRotateSpeed, count, radius]);
-
-//     // سحب بالإصبع أو الماوس عشان الموبايل يقدر يلف الدايرة من غير سكرول
-//     const onPointerDown = (e) => {
-//       dragRef.current = {
-//         active: true,
-//         startX: e.clientX,
-//         startOffset: dragOffsetRef.current,
-//         moved: false,
-//       };
-//       e.currentTarget.setPointerCapture?.(e.pointerId);
-//     };
-
-//     const onPointerMove = (e) => {
-//       if (!dragRef.current.active) return;
-//       const dx = e.clientX - dragRef.current.startX;
-//       if (Math.abs(dx) > 4) dragRef.current.moved = true;
-//       const delta = dx * 0.35;
-//       dragOffsetRef.current = dragRef.current.startOffset + delta;
-//       targetRef.current += delta * 0.08;
-//     };
-
-//     const endDrag = (e) => {
-//       if (!dragRef.current.active) return;
-//       dragRef.current.active = false;
-//       e.currentTarget.releasePointerCapture?.(e.pointerId);
-//     };
-
-//     const anglePerItem = 360 / count;
-
-//     return (
-//       <div
-//         ref={ref}
-//         role="region"
-//         aria-label="معرض المشاريع الدائري"
-//         className={cn(
-//           "relative w-full h-full flex items-center justify-center touch-pan-y select-none",
-//           className
-//         )}
-//         style={{ perspective: `${layout.perspective}px` }}
-//         onPointerDown={onPointerDown}
-//         onPointerMove={onPointerMove}
-//         onPointerUp={endDrag}
-//         onPointerCancel={endDrag}
-//         {...props}
-//       >
-//         <div
-//           ref={ringRef}
-//           className="relative w-full h-full"
-//           style={{ transformStyle: "preserve-3d", willChange: "transform" }}
-//         >
-//           {items.map((item, i) => (
-//             <div
-//               key={`${item.src}-${i}`}
-//               ref={(el) => (itemRefs.current[i] = el)}
-//               role="group"
-//               aria-label={item.title}
-//               className="absolute left-1/2 top-1/2"
-//               style={{
-//                 width: `${layout.cardW}px`,
-//                 height: `${layout.cardH}px`,
-//                 // translate(-50%,-50%) بدل الـ margin الثابت، عشان التوسيط
-//                 // يفضل مظبوط مع أي مقاس كارت
-//                 transform: `translate(-50%, -50%) rotateY(${i * anglePerItem}deg) translateZ(${radius}px)`,
-//                 transition: "opacity 0.3s linear",
-//                 backfaceVisibility: "hidden",
-//               }}
-//             >
-//               <div className="relative w-full h-full rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden border border-white/10 bg-[#1E2432]">
-//                 <img
-//                   src={item.src}
-//                   alt={item.alt}
-//                   loading="lazy"
-//                   draggable={false}
-//                   className="absolute inset-0 w-full h-full object-cover"
-//                 />
-//                 <div className="absolute inset-0 bg-gradient-to-t from-[#1E2432]/95 via-[#1E2432]/10 to-transparent" />
-
-//                 <span
-//                   className={cn(
-//                     "absolute top-2 right-2 sm:top-3 sm:right-3 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full",
-//                     item.status === "Finished"
-//                       ? "bg-[#FFBF00] text-[#1E2432]"
-//                       : "bg-white/15 text-white backdrop-blur-sm"
-//                   )}
-//                 >
-//                   {item.status}
-//                 </span>
-
-//                 <div className="absolute bottom-0 left-0 w-full p-2.5 sm:p-4">
-//                   <h3 className="text-[11px] sm:text-sm md:text-base font-bold text-white uppercase leading-snug line-clamp-3">
-//                     {item.title}
-//                   </h3>
-//                 </div>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     );
-//   }
-// );
-
-// CircularGallery.displayName = "CircularGallery";
-
-// export default CircularGallery;
+// // function cn(...classes) {
+// //   return classes.filter(Boolean).join(" ");
+// // }
 
 
+// // function getLayout(width) {
+// //   if (width < 480) return { cardW: 132, cardH: 178, perspective: 800 };
+// //   if (width < 640) return { cardW: 150, cardH: 200, perspective: 950 };
+// //   if (width < 1024) return { cardW: 200, cardH: 265, perspective: 1300 };
+// //   return { cardW: 260, cardH: 340, perspective: 1800 };
+// // }
+
+// // const CircularGallery = forwardRef(
+// //   (
+// //     { items, className, radius: baseRadius = 550, autoRotateSpeed = 0.02, ...props },
+// //     ref
+// //   ) => {
+// //     const [layout, setLayout] = useState(() =>
+// //       getLayout(typeof window === "undefined" ? 1280 : window.innerWidth)
+// //     );
+
+// //     const ringRef = useRef(null);
+// //     const itemRefs = useRef([]);
+// //     const rotationRef = useRef(0);
+// //     const targetRef = useRef(0);
+// //     const dragOffsetRef = useRef(0);
+// //     const isScrollingRef = useRef(false);
+// //     const scrollTimeoutRef = useRef(null);
+// //     const rafRef = useRef(0);
+// //     const dragRef = useRef({ active: false, startX: 0, startOffset: 0, moved: false });
+
+// //     // نصف القطر بيتحسب من عدد الكاردز ومقاسها، مش رقم ثابت
+// //     const count = Math.max(items.length, 1);
+// //     const derivedRadius = (layout.cardW * count) / (2 * Math.PI) * 1.08;
+// //     const radius =
+// //       layout.cardW >= 260 ? Math.max(derivedRadius, baseRadius * 0.9) : derivedRadius;
+
+// //     // تحديث المقاسات مع أي تغيير في عرض الشاشة (أو دوران الموبايل)
+// //     useEffect(() => {
+// //       const onResize = () => setLayout(getLayout(window.innerWidth));
+// //       onResize();
+// //       window.addEventListener("resize", onResize);
+// //       window.addEventListener("orientationchange", onResize);
+// //       return () => {
+// //         window.removeEventListener("resize", onResize);
+// //         window.removeEventListener("orientationchange", onResize);
+// //       };
+// //     }, []);
+
+// //     // السكرول بيحرّك الدايرة
+// //     useEffect(() => {
+// //       const handleScroll = () => {
+// //         isScrollingRef.current = true;
+// //         if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+
+// //         const scrollableHeight =
+// //           document.documentElement.scrollHeight - window.innerHeight;
+// //         const scrollProgress =
+// //           scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0;
+// //         targetRef.current = scrollProgress * 720 + dragOffsetRef.current;
+
+// //         scrollTimeoutRef.current = setTimeout(() => {
+// //           isScrollingRef.current = false;
+// //         }, 150);
+// //       };
+
+// //       window.addEventListener("scroll", handleScroll, { passive: true });
+// //       return () => {
+// //         window.removeEventListener("scroll", handleScroll);
+// //         if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+// //       };
+// //     }, []);
+
+// //     /**
+// //      * لوب الأنيميشن. الدوران متسجّل في ref والـ DOM بيتحدّث مباشرة،
+// //      * من غير setState كل فريم — ده الفرق الكبير في الأداء على الموبايل.
+// //      */
+// //     useEffect(() => {
+// //       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// //       const tick = () => {
+// //         if (!isScrollingRef.current && !dragRef.current.active && !reduceMotion) {
+// //           targetRef.current += autoRotateSpeed;
+// //         }
+
+// //         rotationRef.current += (targetRef.current - rotationRef.current) * 0.12;
+// //         const rotation = rotationRef.current;
+
+// //         if (ringRef.current) {
+// //           ringRef.current.style.transform = `translateZ(${-radius * 0.15}px) rotateY(${rotation}deg)`;
+// //         }
+
+// //         const anglePerItem = 360 / count;
+// //         for (let i = 0; i < count; i++) {
+// //           const el = itemRefs.current[i];
+// //           if (!el) continue;
+// //           const relativeAngle = (i * anglePerItem + (rotation % 360) + 360) % 360;
+// //           const normalized = relativeAngle > 180 ? 360 - relativeAngle : relativeAngle;
+// //           el.style.opacity = String(Math.max(0.25, 1 - normalized / 180));
+// //         }
+
+// //         rafRef.current = requestAnimationFrame(tick);
+// //       };
+
+// //       rafRef.current = requestAnimationFrame(tick);
+// //       return () => cancelAnimationFrame(rafRef.current);
+// //     }, [autoRotateSpeed, count, radius]);
+
+// //     // سحب بالإصبع أو الماوس عشان الموبايل يقدر يلف الدايرة من غير سكرول
+// //     const onPointerDown = (e) => {
+// //       dragRef.current = {
+// //         active: true,
+// //         startX: e.clientX,
+// //         startOffset: dragOffsetRef.current,
+// //         moved: false,
+// //       };
+// //       e.currentTarget.setPointerCapture?.(e.pointerId);
+// //     };
+
+// //     const onPointerMove = (e) => {
+// //       if (!dragRef.current.active) return;
+// //       const dx = e.clientX - dragRef.current.startX;
+// //       if (Math.abs(dx) > 4) dragRef.current.moved = true;
+// //       const delta = dx * 0.35;
+// //       dragOffsetRef.current = dragRef.current.startOffset + delta;
+// //       targetRef.current += delta * 0.08;
+// //     };
+
+// //     const endDrag = (e) => {
+// //       if (!dragRef.current.active) return;
+// //       dragRef.current.active = false;
+// //       e.currentTarget.releasePointerCapture?.(e.pointerId);
+// //     };
+
+// //     const anglePerItem = 360 / count;
+
+// //     return (
+// //       <div
+// //         ref={ref}
+// //         role="region"
+// //         aria-label="معرض المشاريع الدائري"
+// //         className={cn(
+// //           "relative w-full h-full flex items-center justify-center touch-pan-y select-none",
+// //           className
+// //         )}
+// //         style={{ perspective: `${layout.perspective}px` }}
+// //         onPointerDown={onPointerDown}
+// //         onPointerMove={onPointerMove}
+// //         onPointerUp={endDrag}
+// //         onPointerCancel={endDrag}
+// //         {...props}
+// //       >
+// //         <div
+// //           ref={ringRef}
+// //           className="relative w-full h-full"
+// //           style={{ transformStyle: "preserve-3d", willChange: "transform" }}
+// //         >
+// //           {items.map((item, i) => (
+// //             <div
+// //               key={`${item.src}-${i}`}
+// //               ref={(el) => (itemRefs.current[i] = el)}
+// //               role="group"
+// //               aria-label={item.title}
+// //               className="absolute left-1/2 top-1/2"
+// //               style={{
+// //                 width: `${layout.cardW}px`,
+// //                 height: `${layout.cardH}px`,
+// //                 // translate(-50%,-50%) بدل الـ margin الثابت، عشان التوسيط
+// //                 // يفضل مظبوط مع أي مقاس كارت
+// //                 transform: `translate(-50%, -50%) rotateY(${i * anglePerItem}deg) translateZ(${radius}px)`,
+// //                 transition: "opacity 0.3s linear",
+// //                 backfaceVisibility: "hidden",
+// //               }}
+// //             >
+// //               <div className="relative w-full h-full rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden border border-white/10 bg-[#1E2432]">
+// //                 <img
+// //                   src={item.src}
+// //                   alt={item.alt}
+// //                   loading="lazy"
+// //                   draggable={false}
+// //                   className="absolute inset-0 w-full h-full object-cover"
+// //                 />
+// //                 <div className="absolute inset-0 bg-gradient-to-t from-[#1E2432]/95 via-[#1E2432]/10 to-transparent" />
+
+// //                 <span
+// //                   className={cn(
+// //                     "absolute top-2 right-2 sm:top-3 sm:right-3 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full",
+// //                     item.status === "Finished"
+// //                       ? "bg-[#FFBF00] text-[#1E2432]"
+// //                       : "bg-white/15 text-white backdrop-blur-sm"
+// //                   )}
+// //                 >
+// //                   {item.status}
+// //                 </span>
+
+// //                 <div className="absolute bottom-0 left-0 w-full p-2.5 sm:p-4">
+// //                   <h3 className="text-[11px] sm:text-sm md:text-base font-bold text-white uppercase leading-snug line-clamp-3">
+// //                     {item.title}
+// //                   </h3>
+// //                 </div>
+// //               </div>
+// //             </div>
+// //           ))}
+// //         </div>
+// //       </div>
+// //     );
+// //   }
+// // );
+
+// // CircularGallery.displayName = "CircularGallery";
+
+// // export default CircularGallery;
 
 
 
 
 
+
+
+
+
+// // import { forwardRef, useState, useEffect, useRef } from "react";
+
+// // function cn(...classes) {
+// //   return classes.filter(Boolean).join(" ");
+// // }
+
+// // function getLayout(width) {
+// //   if (width < 480) return { cardW: 132, cardH: 178, perspective: 800 };
+// //   if (width < 640) return { cardW: 150, cardH: 200, perspective: 950 };
+// //   if (width < 1024) return { cardW: 200, cardH: 265, perspective: 1300 };
+// //   return { cardW: 260, cardH: 340, perspective: 1800 };
+// // }
+
+// // const CircularGallery = forwardRef(
+// //   (
+// //     {
+// //       items,
+// //       className,
+// //       radius: baseRadius = 550,
+// //       autoRotateSpeed = 0.02,
+// //       ...props
+// //     },
+// //     ref
+// //   ) => {
+// //     const [layout, setLayout] = useState(() =>
+// //       getLayout(typeof window === "undefined" ? 1280 : window.innerWidth)
+// //     );
+
+// //     const ringRef = useRef(null);
+// //     const itemRefs = useRef([]);
+// //     const rotationRef = useRef(0);
+// //     const targetRef = useRef(0);
+// //     const dragOffsetRef = useRef(0);
+// //     const isScrollingRef = useRef(false);
+// //     const scrollTimeoutRef = useRef(null);
+// //     const rafRef = useRef(0);
+
+// //     const dragRef = useRef({
+// //       active: false,
+// //       startX: 0,
+// //       startOffset: 0,
+// //       moved: false,
+// //     });
+
+// //     // نصف القطر بيتحسب من عدد الكاردز ومقاسها
+// //     const count = Math.max(items.length, 1);
+
+// //     const derivedRadius =
+// //       (layout.cardW * count) / (2 * Math.PI) * 1.08;
+
+// //     const radius =
+// //       layout.cardW >= 260
+// //         ? Math.max(derivedRadius, baseRadius * 0.9)
+// //         : derivedRadius;
+
+// //     // تحديث المقاسات مع تغيير عرض الشاشة
+// //     useEffect(() => {
+// //       const onResize = () => {
+// //         setLayout(getLayout(window.innerWidth));
+// //       };
+
+// //       onResize();
+
+// //       window.addEventListener("resize", onResize);
+// //       window.addEventListener("orientationchange", onResize);
+
+// //       return () => {
+// //         window.removeEventListener("resize", onResize);
+// //         window.removeEventListener("orientationchange", onResize);
+// //       };
+// //     }, []);
+
+// //     // السكرول بيحرّك الدايرة
+// //     useEffect(() => {
+// //       const handleScroll = () => {
+// //         isScrollingRef.current = true;
+
+// //         if (scrollTimeoutRef.current) {
+// //           clearTimeout(scrollTimeoutRef.current);
+// //         }
+
+// //         const scrollableHeight =
+// //           document.documentElement.scrollHeight - window.innerHeight;
+
+// //         const scrollProgress =
+// //           scrollableHeight > 0
+// //             ? window.scrollY / scrollableHeight
+// //             : 0;
+
+// //         targetRef.current =
+// //           scrollProgress * 720 + dragOffsetRef.current;
+
+// //         scrollTimeoutRef.current = setTimeout(() => {
+// //           isScrollingRef.current = false;
+// //         }, 150);
+// //       };
+
+// //       window.addEventListener("scroll", handleScroll, {
+// //         passive: true,
+// //       });
+
+// //       return () => {
+// //         window.removeEventListener("scroll", handleScroll);
+
+// //         if (scrollTimeoutRef.current) {
+// //           clearTimeout(scrollTimeoutRef.current);
+// //         }
+// //       };
+// //     }, []);
+
+// //     // Animation loop
+// //     useEffect(() => {
+// //       const reduceMotion = window.matchMedia(
+// //         "(prefers-reduced-motion: reduce)"
+// //       ).matches;
+
+// //       const tick = () => {
+// //         if (
+// //           !isScrollingRef.current &&
+// //           !dragRef.current.active &&
+// //           !reduceMotion
+// //         ) {
+// //           targetRef.current += autoRotateSpeed;
+// //         }
+
+// //         rotationRef.current +=
+// //           (targetRef.current - rotationRef.current) * 0.12;
+
+// //         const rotation = rotationRef.current;
+
+// //         if (ringRef.current) {
+// //           ringRef.current.style.transform = `
+// //             translateZ(${-radius * 0.15}px)
+// //             rotateY(${rotation}deg)
+// //           `;
+// //         }
+
+// //         const anglePerItem = 360 / count;
+
+// //         for (let i = 0; i < count; i++) {
+// //           const el = itemRefs.current[i];
+
+// //           if (!el) continue;
+
+// //           const relativeAngle =
+// //             (i * anglePerItem + (rotation % 360) + 360) % 360;
+
+// //           const normalized =
+// //             relativeAngle > 180
+// //               ? 360 - relativeAngle
+// //               : relativeAngle;
+
+// //           el.style.opacity = String(
+// //             Math.max(0.25, 1 - normalized / 180)
+// //           );
+// //         }
+
+// //         rafRef.current = requestAnimationFrame(tick);
+// //       };
+
+// //       rafRef.current = requestAnimationFrame(tick);
+
+// //       return () => cancelAnimationFrame(rafRef.current);
+// //     }, [autoRotateSpeed, count, radius]);
+
+// //     // سحب بالإصبع أو الماوس
+// //     const onPointerDown = (e) => {
+// //       dragRef.current = {
+// //         active: true,
+// //         startX: e.clientX,
+// //         startOffset: dragOffsetRef.current,
+// //         moved: false,
+// //       };
+
+// //       e.currentTarget.setPointerCapture?.(e.pointerId);
+// //     };
+
+// //     const onPointerMove = (e) => {
+// //       if (!dragRef.current.active) return;
+
+// //       const dx = e.clientX - dragRef.current.startX;
+
+// //       if (Math.abs(dx) > 4) {
+// //         dragRef.current.moved = true;
+// //       }
+
+// //       const delta = dx * 0.35;
+
+// //       dragOffsetRef.current =
+// //         dragRef.current.startOffset + delta;
+
+// //       targetRef.current += delta * 0.08;
+// //     };
+
+// //     const endDrag = (e) => {
+// //       if (!dragRef.current.active) return;
+
+// //       dragRef.current.active = false;
+
+// //       e.currentTarget.releasePointerCapture?.(e.pointerId);
+// //     };
+
+// //     const anglePerItem = 360 / count;
+
+// //     return (
+// //       <div
+// //         ref={ref}
+// //         role="region"
+// //         aria-label="معرض المشاريع الدائري"
+// //         className={cn(
+// //           "relative w-full h-full flex items-center justify-center touch-pan-y select-none",
+// //           className
+// //         )}
+// //         style={{
+// //           perspective: `${layout.perspective}px`,
+// //         }}
+// //         onPointerDown={onPointerDown}
+// //         onPointerMove={onPointerMove}
+// //         onPointerUp={endDrag}
+// //         onPointerCancel={endDrag}
+// //         {...props}
+// //       >
+// //         <div
+// //           ref={ringRef}
+// //           className="relative w-full h-full"
+// //           style={{
+// //             transformStyle: "preserve-3d",
+// //             willChange: "transform",
+// //           }}
+// //         >
+// //           {items.map((item, i) => (
+// //             <div
+// //               key={`${item.src}-${i}`}
+// //               ref={(el) => (itemRefs.current[i] = el)}
+// //               role="group"
+// //               aria-label={item.title}
+// //               className="absolute left-1/2 top-1/2"
+// //               style={{
+// //                 width: `${layout.cardW}px`,
+// //                 height: `${layout.cardH}px`,
+// //                 transform: `
+// //                   translate(-50%, -50%)
+// //                   rotateY(${i * anglePerItem}deg)
+// //                   translateZ(${radius}px)
+// //                 `,
+// //                 transition: "opacity 0.3s linear",
+// //                 backfaceVisibility: "hidden",
+// //               }}
+// //             >
+// //               <div className="relative w-full h-full rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden border border-white/10 bg-[#3C3C3B]">
+
+// //                 {/* Project Image */}
+// //                 <img
+// //                   src={item.src}
+// //                   alt={item.alt}
+// //                   loading="lazy"
+// //                   draggable={false}
+// //                   className="absolute inset-0 w-full h-full object-cover"
+// //                 />
+
+// //                 {/* Dark Overlay */}
+// //                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+
+// //                 {/* Status */}
+// //                 <span
+// //                   className={cn(
+// //                     "absolute top-2 right-2 sm:top-3 sm:right-3",
+// //                     "text-[9px] sm:text-[10px]",
+// //                     "font-semibold uppercase tracking-wide",
+// //                     "px-2 py-0.5 sm:px-2.5 sm:py-1",
+// //                     "rounded-full",
+// //                     "backdrop-blur-sm",
+
+// //                     item.status === "Delivered"
+// //                       ? "bg-[#3F7D5A] text-white"
+// //                       : "bg-[#D6A800] text-black"
+// //                   )}
+// //                 >
+// //                   {item.status}
+// //                 </span>
+
+// //                 {/* Project Title */}
+// //                 <div className="absolute bottom-0 left-0 w-full p-2.5 sm:p-4">
+// //                   <h3 className="text-[11px] sm:text-sm md:text-base font-bold text-white uppercase leading-snug line-clamp-3">
+// //                     {item.title}
+// //                   </h3>
+// //                 </div>
+// //               </div>
+// //             </div>
+// //           ))}
+// //         </div>
+// //       </div>
+// //     );
+// //   }
+// // );
+
+// // CircularGallery.displayName = "CircularGallery";
+
+// // export default CircularGallery;
 
 
 // import { forwardRef, useState, useEffect, useRef } from "react";
@@ -254,6 +555,7 @@
 
 //     const ringRef = useRef(null);
 //     const itemRefs = useRef([]);
+//     const overlayRefs = useRef([]); // طبقة التعتيم بتاعة كل كارت
 //     const rotationRef = useRef(0);
 //     const targetRef = useRef(0);
 //     const dragOffsetRef = useRef(0);
@@ -365,6 +667,7 @@
 
 //         for (let i = 0; i < count; i++) {
 //           const el = itemRefs.current[i];
+//           const overlayEl = overlayRefs.current[i];
 
 //           if (!el) continue;
 
@@ -376,9 +679,14 @@
 //               ? 360 - relativeAngle
 //               : relativeAngle;
 
-//           el.style.opacity = String(
-//             Math.max(0.25, 1 - normalized / 180)
-//           );
+//           // الكارت نفسه يفضل صلب 100% طول الوقت — مفيش أي شفافية على الـ wrapper
+//           el.style.opacity = "1";
+
+//           // التعتيم بيحصل بس على طبقة overlay سودة فوق الكارت، مش على الكارت نفسه
+//           if (overlayEl) {
+//             const dim = Math.min(0.7, normalized / 180) * 0.75;
+//             overlayEl.style.opacity = String(dim);
+//           }
 //         }
 
 //         rafRef.current = requestAnimationFrame(tick);
@@ -469,10 +777,11 @@
 //                   rotateY(${i * anglePerItem}deg)
 //                   translateZ(${radius}px)
 //                 `,
-//                 transition: "opacity 0.3s linear",
+//                 transition: "none",
 //                 backfaceVisibility: "hidden",
 //               }}
 //             >
+//               {/* الكارت نفسه صلب 100% دايمًا - bg + صورة أوباك بالكامل */}
 //               <div className="relative w-full h-full rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden border border-white/10 bg-[#3C3C3B]">
 
 //                 {/* Project Image */}
@@ -484,8 +793,15 @@
 //                   className="absolute inset-0 w-full h-full object-cover"
 //                 />
 
-//                 {/* Dark Overlay */}
+//                 {/* Dark Overlay الأصلية (تدرج ثابت لقراءة النص) */}
 //                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+
+//                 {/* طبقة التعتيم الديناميكية للعمق - فوق الكارت، مش بديلة عنه */}
+//                 <div
+//                   ref={(el) => (overlayRefs.current[i] = el)}
+//                   className="absolute inset-0 bg-black pointer-events-none transition-opacity"
+//                   style={{ opacity: 0, willChange: "opacity" }}
+//                 />
 
 //                 {/* Status */}
 //                 <span
@@ -525,6 +841,8 @@
 // export default CircularGallery;
 
 
+
+
 import { forwardRef, useState, useEffect, useRef } from "react";
 
 function cn(...classes) {
@@ -532,10 +850,11 @@ function cn(...classes) {
 }
 
 function getLayout(width) {
-  if (width < 480) return { cardW: 132, cardH: 178, perspective: 800 };
-  if (width < 640) return { cardW: 150, cardH: 200, perspective: 950 };
-  if (width < 1024) return { cardW: 200, cardH: 265, perspective: 1300 };
-  return { cardW: 260, cardH: 340, perspective: 1800 };
+  // Landscape cards — صور المشاريع بالعرض
+  if (width < 480) return { cardW: 168, cardH: 112, perspective: 800 };
+  if (width < 640) return { cardW: 190, cardH: 126, perspective: 950 };
+  if (width < 1024) return { cardW: 260, cardH: 172, perspective: 1300 };
+  return { cardW: 340, cardH: 220, perspective: 1800 };
 }
 
 const CircularGallery = forwardRef(
@@ -555,7 +874,7 @@ const CircularGallery = forwardRef(
 
     const ringRef = useRef(null);
     const itemRefs = useRef([]);
-    const overlayRefs = useRef([]); // طبقة التعتيم بتاعة كل كارت
+    const overlayRefs = useRef([]);
     const rotationRef = useRef(0);
     const targetRef = useRef(0);
     const dragOffsetRef = useRef(0);
@@ -570,18 +889,16 @@ const CircularGallery = forwardRef(
       moved: false,
     });
 
-    // نصف القطر بيتحسب من عدد الكاردز ومقاسها
     const count = Math.max(items.length, 1);
 
-    const derivedRadius =
-      (layout.cardW * count) / (2 * Math.PI) * 1.08;
+    // الـ radius بيتحسب من عرض الكارت × العدد → مع landscape هيكبر شوية لوحده
+    const derivedRadius = ((layout.cardW * count) / (2 * Math.PI)) * 1.08;
 
     const radius =
       layout.cardW >= 260
         ? Math.max(derivedRadius, baseRadius * 0.9)
         : derivedRadius;
 
-    // تحديث المقاسات مع تغيير عرض الشاشة
     useEffect(() => {
       const onResize = () => {
         setLayout(getLayout(window.innerWidth));
@@ -598,7 +915,6 @@ const CircularGallery = forwardRef(
       };
     }, []);
 
-    // السكرول بيحرّك الدايرة
     useEffect(() => {
       const handleScroll = () => {
         isScrollingRef.current = true;
@@ -611,32 +927,25 @@ const CircularGallery = forwardRef(
           document.documentElement.scrollHeight - window.innerHeight;
 
         const scrollProgress =
-          scrollableHeight > 0
-            ? window.scrollY / scrollableHeight
-            : 0;
+          scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0;
 
-        targetRef.current =
-          scrollProgress * 720 + dragOffsetRef.current;
+        targetRef.current = scrollProgress * 720 + dragOffsetRef.current;
 
         scrollTimeoutRef.current = setTimeout(() => {
           isScrollingRef.current = false;
         }, 150);
       };
 
-      window.addEventListener("scroll", handleScroll, {
-        passive: true,
-      });
+      window.addEventListener("scroll", handleScroll, { passive: true });
 
       return () => {
         window.removeEventListener("scroll", handleScroll);
-
         if (scrollTimeoutRef.current) {
           clearTimeout(scrollTimeoutRef.current);
         }
       };
     }, []);
 
-    // Animation loop
     useEffect(() => {
       const reduceMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)"
@@ -651,8 +960,7 @@ const CircularGallery = forwardRef(
           targetRef.current += autoRotateSpeed;
         }
 
-        rotationRef.current +=
-          (targetRef.current - rotationRef.current) * 0.12;
+        rotationRef.current += (targetRef.current - rotationRef.current) * 0.12;
 
         const rotation = rotationRef.current;
 
@@ -668,21 +976,16 @@ const CircularGallery = forwardRef(
         for (let i = 0; i < count; i++) {
           const el = itemRefs.current[i];
           const overlayEl = overlayRefs.current[i];
-
           if (!el) continue;
 
           const relativeAngle =
             (i * anglePerItem + (rotation % 360) + 360) % 360;
 
           const normalized =
-            relativeAngle > 180
-              ? 360 - relativeAngle
-              : relativeAngle;
+            relativeAngle > 180 ? 360 - relativeAngle : relativeAngle;
 
-          // الكارت نفسه يفضل صلب 100% طول الوقت — مفيش أي شفافية على الـ wrapper
           el.style.opacity = "1";
 
-          // التعتيم بيحصل بس على طبقة overlay سودة فوق الكارت، مش على الكارت نفسه
           if (overlayEl) {
             const dim = Math.min(0.7, normalized / 180) * 0.75;
             overlayEl.style.opacity = String(dim);
@@ -697,7 +1000,6 @@ const CircularGallery = forwardRef(
       return () => cancelAnimationFrame(rafRef.current);
     }, [autoRotateSpeed, count, radius]);
 
-    // سحب بالإصبع أو الماوس
     const onPointerDown = (e) => {
       dragRef.current = {
         active: true,
@@ -705,7 +1007,6 @@ const CircularGallery = forwardRef(
         startOffset: dragOffsetRef.current,
         moved: false,
       };
-
       e.currentTarget.setPointerCapture?.(e.pointerId);
     };
 
@@ -719,18 +1020,13 @@ const CircularGallery = forwardRef(
       }
 
       const delta = dx * 0.35;
-
-      dragOffsetRef.current =
-        dragRef.current.startOffset + delta;
-
+      dragOffsetRef.current = dragRef.current.startOffset + delta;
       targetRef.current += delta * 0.08;
     };
 
     const endDrag = (e) => {
       if (!dragRef.current.active) return;
-
       dragRef.current.active = false;
-
       e.currentTarget.releasePointerCapture?.(e.pointerId);
     };
 
@@ -759,7 +1055,7 @@ const CircularGallery = forwardRef(
           className="relative w-full h-full"
           style={{
             transformStyle: "preserve-3d",
-            willChange: "transform",
+            // willChange: "transform",
           }}
         >
           {items.map((item, i) => (
@@ -781,10 +1077,7 @@ const CircularGallery = forwardRef(
                 backfaceVisibility: "hidden",
               }}
             >
-              {/* الكارت نفسه صلب 100% دايمًا - bg + صورة أوباك بالكامل */}
               <div className="relative w-full h-full rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden border border-white/10 bg-[#3C3C3B]">
-
-                {/* Project Image */}
                 <img
                   src={item.src}
                   alt={item.alt}
@@ -793,17 +1086,14 @@ const CircularGallery = forwardRef(
                   className="absolute inset-0 w-full h-full object-cover"
                 />
 
-                {/* Dark Overlay الأصلية (تدرج ثابت لقراءة النص) */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
 
-                {/* طبقة التعتيم الديناميكية للعمق - فوق الكارت، مش بديلة عنه */}
                 <div
                   ref={(el) => (overlayRefs.current[i] = el)}
                   className="absolute inset-0 bg-black pointer-events-none transition-opacity"
                   style={{ opacity: 0, willChange: "opacity" }}
                 />
 
-                {/* Status */}
                 <span
                   className={cn(
                     "absolute top-2 right-2 sm:top-3 sm:right-3",
@@ -812,18 +1102,16 @@ const CircularGallery = forwardRef(
                     "px-2 py-0.5 sm:px-2.5 sm:py-1",
                     "rounded-full",
                     "backdrop-blur-sm",
-
                     item.status === "Delivered"
-                      ? "bg-[#3F7D5A] text-white"
-                      : "bg-[#D6A800] text-black"
+                      ? "bg-[#3fc177] text-white"
+                      : "bg-[#e5bc29] text-black"
                   )}
-                >
+                > 
                   {item.status}
                 </span>
 
-                {/* Project Title */}
                 <div className="absolute bottom-0 left-0 w-full p-2.5 sm:p-4">
-                  <h3 className="text-[11px] sm:text-sm md:text-base font-bold text-white uppercase leading-snug line-clamp-3">
+                  <h3 className="text-[11px] sm:text-sm md:text-base font-bold text-white uppercase leading-snug line-clamp-2">
                     {item.title}
                   </h3>
                 </div>
@@ -839,5 +1127,3 @@ const CircularGallery = forwardRef(
 CircularGallery.displayName = "CircularGallery";
 
 export default CircularGallery;
-
-

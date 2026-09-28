@@ -268,7 +268,7 @@ export default function ProjectHero({ project }) {
             mb-3 inline-block
             text-[11px] font-semibold uppercase
             tracking-[0.25em]
-            text-[#2A317A]
+            text-[#FFFFFF]
             sm:text-xs
           "
         >
@@ -303,20 +303,20 @@ export default function ProjectHero({ project }) {
         >
           {project.location && (
             <span className="flex items-center gap-1.5">
-              <MapPin className="h-4 w-4 text-[#2A317A]" />
+              <MapPin className="h-4 w-4 text-[#FFFFFF]" />
               {project.location}
             </span>
           )}
 
           {project.year && (
             <span className="flex items-center gap-1.5">
-              <Calendar className="h-4 w-4 text-[#2A317A]" />
+              <Calendar className="h-4 w-4 text-[#FFFFFF]" />
               {project.year}
             </span>
           )}
 
           <span className="flex items-center gap-1.5">
-            <Building2 className="h-4 w-4 text-[#2A317A]" />
+            <Building2 className="h-4 w-4 text-[#FFFFFF]" />
             {project.category}
           </span>
         </motion.div>
